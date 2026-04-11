@@ -23,10 +23,10 @@ Open `Preferences -> Zotero2Eagle` and configure:
 
 ## Manual Export
 
-Use either of these entry points:
+Use the PDF reader annotation context menu:
 
-- Item context menu: `Export Selected Image Annotations to Eagle`
-- Tools menu: `Zotero2Eagle -> Export Selected Image Annotations to Eagle`
+- Right-click one or more image annotations in the PDF reader
+- Choose `Export Selected Image Annotations to Eagle`
 
 ## Development
 
@@ -38,10 +38,10 @@ npm test
 
 ## Release
 
-Current release target: `v0.1.0`
+Current release target: `v0.1.1`
 
-- Release notes: [doc/RELEASE-v0.1.0.md](./doc/RELEASE-v0.1.0.md)
-- Tag name: `v0.1.0`
+- Release notes: [doc/RELEASE-v0.1.1.md](./doc/RELEASE-v0.1.1.md)
+- Tag name: `v0.1.1`
 
 ## Notes
 

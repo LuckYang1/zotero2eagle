@@ -63,16 +63,11 @@ npm run build
 
 ### 手动导出
 
-可从以下入口触发：
+在 PDF 阅读器中：
 
-- 条目右键菜单：`Export Selected Image Annotations to Eagle`
-- `Tools -> Zotero2Eagle -> Export Selected Image Annotations to Eagle`
-
-支持三种选择对象：
-
-- 单个图片标注
-- PDF 附件
-- 顶层文献条目
+- 选中一个或多个图片标注
+- 右键
+- 点击 `Export Selected Image Annotations to Eagle`
 
 ## 验证
 
@@ -109,5 +104,5 @@ npm test
 
 ## 发布
 
-- 当前版本：`v0.1.0`
-- Release note：[`doc/RELEASE-v0.1.0.md`](./RELEASE-v0.1.0.md)
+- 当前版本：`v0.1.1`
+- Release note：[`doc/RELEASE-v0.1.1.md`](./RELEASE-v0.1.1.md)

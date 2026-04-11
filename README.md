@@ -46,4 +46,4 @@ Current release target: `v0.1.0`
 ## Notes
 
 - This project uses the Zotero plugin scaffold and runs as a Zotero plugin, not as an Eagle plugin.
-- Eagle integration follows the `addFromPath(path, options)` field semantics documented in the Eagle Plugin API, but the bridge is executed from Zotero through Eagle's local HTTP API.
+- Eagle integration is executed from Zotero through Eagle's local HTTP API. Note that the local HTTP API uses `folderId` for the destination folder, while the Eagle Plugin API uses `folders`.

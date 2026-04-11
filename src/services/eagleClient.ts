@@ -12,7 +12,7 @@ export interface MetadataSummary {
 
 export interface EagleAddFromPathOptions {
   annotation?: string;
-  folders?: string[];
+  folderId?: string;
   name?: string;
   tags?: string[];
   website?: string;
@@ -82,9 +82,9 @@ function getToken() {
   return (getPref("eagleApiToken") || "").trim();
 }
 
-function buildFolders(folderId?: string | null) {
+function buildFolderId(folderId?: string | null) {
   const value = (folderId || getPref("eagleFolderId") || "").trim();
-  return value ? [value] : undefined;
+  return value || undefined;
 }
 
 async function request<TResponse>(
@@ -189,7 +189,7 @@ export function buildEagleOptions(
 ): EagleAddFromPathOptions {
   return {
     annotation: buildEagleAnnotation(metadata),
-    folders: buildFolders(folderId),
+    folderId: buildFolderId(folderId),
     name: buildEagleFilename(metadata),
     tags: buildEagleTags(metadata),
     website,

@@ -88,6 +88,12 @@ npm run build
    - 预期 tags
 6. 点击 Eagle 中的 `website`，确认能跳回 Zotero PDF
 
+注意：
+
+- 本项目从 Zotero 侧调用的是 Eagle 本地 HTTP API
+- 本地 HTTP API 的目标文件夹字段是 `folderId`
+- Eagle Plugin API 中对应概念是 `folders`，两者不要混用
+
 ## 测试
 
 ```bash

@@ -2,6 +2,7 @@ import { assert } from "chai";
 import {
   buildEagleAnnotation,
   buildEagleFilename,
+  buildEagleOptions,
   buildEagleTags,
   MetadataSummary,
 } from "../src/services/eagleClient";
@@ -57,5 +58,15 @@ describe("eagle export helpers", function () {
     });
 
     assert.equal(filename, "Unsafe_Name_ATTACH99_p7.png");
+  });
+
+  it("should map folder id for the local Eagle HTTP API", function () {
+    const options = buildEagleOptions(
+      sampleMetadata,
+      "zotero://open-pdf/library/items/ATTACH99?page=7&annotation=ANN12345",
+      "FOLDER123",
+    );
+
+    assert.equal(options.folderId, "FOLDER123");
   });
 });

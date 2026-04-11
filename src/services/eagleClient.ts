@@ -29,7 +29,11 @@ export interface ExportResult {
 function sanitizeNameSegment(value: string) {
   return value
     .trim()
-    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
+    .replace(
+      /./g,
+      (char) =>
+        /[<>:"/\\|?*]/.test(char) || char.charCodeAt(0) < 32 ? "_" : char,
+    )
     .replace(/\s+/g, "_")
     .replace(/_+/g, "_")
     .replace(/^_+|_+$/g, "")

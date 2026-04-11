@@ -1,24 +1,24 @@
 {
-  "name": "zotero-plugin-template",
+  "name": "zotero2eagle",
   "type": "module",
-  "version": "3.1.0",
-  "description": "Zotero Plugin Template",
+  "version": "0.1.0",
+  "description": "Export Zotero image annotations to Eagle with backlinks and metadata",
   "config": {
-    "addonName": "Zotero Plugin Template",
-    "addonID": "addontemplate@euclpts.com",
-    "addonRef": "addontemplate",
-    "addonInstance": "AddonTemplate",
-    "prefsPrefix": "extensions.zotero.addontemplate"
+    "addonName": "Zotero2Eagle",
+    "addonID": "zotero2eagle@euclpts.com",
+    "addonRef": "zotero2eagle",
+    "addonInstance": "Zotero2Eagle",
+    "prefsPrefix": "extensions.zotero.zotero2eagle"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windingwind/zotero-plugin-template.git"
+    "url": "git+https://github.com/yueneiqi/zotero2eagle.git"
   },
-  "author": "windingwind",
+  "author": "YSY",
   "bugs": {
-    "url": "https://github.com/windingwind/zotero-plugin-template/issues"
+    "url": "https://github.com/yueneiqi/zotero2eagle/issues"
   },
-  "homepage": "https://github.com/windingwind/zotero-plugin-template#readme",
+  "homepage": "https://github.com/yueneiqi/zotero2eagle#readme",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "zotero-plugin serve",
@@ -39,7 +39,7 @@
     "@zotero-plugin/eslint-config": "^0.6.7",
     "chai": "^6.2.1",
     "eslint": "^9.39.2",
-    "mocha": "^11.7.5",
+    "mocha": "^7.2.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "zotero-plugin-scaffold": "^0.8.2",

@@ -1,7 +1,7 @@
 import { config } from "../package.json";
-import { ColumnOptions, DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
+import { AnnotationExportService } from "./services/annotationExport";
 
 class Addon {
   public data: {
@@ -14,12 +14,11 @@ class Addon {
     locale?: {
       current: any;
     };
+    menusRegistered?: boolean;
     prefs?: {
       window: Window;
-      columns: Array<ColumnOptions>;
-      rows: Array<{ [dataKey: string]: string }>;
     };
-    dialog?: DialogHelper;
+    annotationExport: AnnotationExportService;
   };
   // Lifecycle hooks
   public hooks: typeof hooks;
@@ -33,6 +32,8 @@ class Addon {
       env: __env__,
       initialized: false,
       ztoolkit: createZToolkit(),
+      menusRegistered: false,
+      annotationExport: new AnnotationExportService(),
     };
     this.hooks = hooks;
     this.api = {};

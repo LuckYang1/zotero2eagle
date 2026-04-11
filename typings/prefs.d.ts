@@ -7,8 +7,10 @@
 declare namespace _ZoteroTypes {
   interface Prefs {
     PluginPrefsMap: {
-      "enable": boolean;
-      "input": string;
+      "enableAutoImport": boolean;
+      "eagleApiUrl": string;
+      "eagleApiToken": string;
+      "eagleFolderId": string;
     };
   }
 }

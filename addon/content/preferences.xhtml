@@ -1,33 +1,140 @@
 <linkset>
   <html:link rel="localization" href="__addonRef__-preferences.ftl" />
 </linkset>
+
 <groupbox
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })"
 >
-  <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
-  <checkbox
-    id="zotero-prefpane-__addonRef__-enable"
-    preference="enable"
-    data-l10n-id="pref-enable"
-  />
-  <hbox>
-    <html:label
-      for="zotero-prefpane-__addonRef__-input"
-      data-l10n-id="pref-input"
-    ></html:label>
-    <html:input
-      type="text"
-      id="zotero-prefpane-__addonRef__-input"
-      preference="input"
-    ></html:input>
+  <hbox class="z2e-section">
+    <html:label class="z2e-title" data-l10n-id="pref-title"></html:label>
   </hbox>
-  <hbox class="virtualized-table-container" flex="1" height="300px">
-    <html:div id="__addonRef__-table-container" />
+
+  <hbox class="z2e-row">
+    <html:input
+      type="checkbox"
+      id="zotero-prefpane-__addonRef__-auto-import"
+      preference="enableAutoImport"
+    ></html:input>
+    <html:label
+      for="zotero-prefpane-__addonRef__-auto-import"
+      data-l10n-id="pref-auto-import"
+    ></html:label>
+  </hbox>
+  <hbox class="z2e-row-tight">
+    <html:div class="z2e-help" data-l10n-id="pref-auto-import-help"></html:div>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-api-url"
+      data-l10n-id="pref-api-url"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:input
+        type="text"
+        id="zotero-prefpane-__addonRef__-api-url"
+        preference="eagleApiUrl"
+      ></html:input>
+      <html:div class="z2e-help" data-l10n-id="pref-api-url-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-api-token"
+      data-l10n-id="pref-api-token"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:input
+        type="password"
+        id="zotero-prefpane-__addonRef__-api-token"
+        preference="eagleApiToken"
+      ></html:input>
+      <html:div class="z2e-help" data-l10n-id="pref-api-token-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-eagle-folder"
+      data-l10n-id="pref-eagle-folder"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:input
+        type="text"
+        id="zotero-prefpane-__addonRef__-eagle-folder"
+        preference="eagleFolderId"
+      ></html:input>
+      <html:div class="z2e-help" data-l10n-id="pref-eagle-folder-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:button
+      id="__addonRef__-test-connection"
+      data-l10n-id="pref-test-connection"
+    ></html:button>
+    <html:span id="__addonRef__-connection-status"></html:span>
   </hbox>
 </groupbox>
+
 <vbox>
   <html:label
     data-l10n-id="pref-help"
     data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'
   ></html:label>
 </vbox>
+
+<html:style><![CDATA[
+  .z2e-section {
+    margin-bottom: 12px;
+  }
+
+  .z2e-title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .z2e-row {
+    align-items: flex-start;
+    margin: 10px 0;
+  }
+
+  .z2e-row-tight {
+    margin: -4px 0 10px 24px;
+  }
+
+  .z2e-label {
+    width: 150px;
+    padding-top: 6px;
+  }
+
+  .z2e-control {
+    max-width: 520px;
+  }
+
+  .z2e-help {
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0.8;
+  }
+
+  html|input[type="text"],
+  html|input[type="password"] {
+    width: 420px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+  }
+
+  html|button[id*="__addonRef__"] {
+    padding: 8px 14px;
+  }
+
+  html|span[id*="connection-status"] {
+    margin-left: 12px;
+    padding-top: 8px;
+  }
+]]></html:style>

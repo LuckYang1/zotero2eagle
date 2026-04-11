@@ -1,5 +1,12 @@
-pref-title = 插件模板设置示例
-pref-enable =
-    .label = 开启
-pref-input = 输入
+pref-title = Eagle 集成
+pref-auto-import =
+    .label = 自动将新的图片标注导入 Eagle
+pref-auto-import-help = 关闭后不会自动导入，但仍可通过条目右键菜单或工具菜单手动导出。
+pref-api-url = Eagle API 地址
+pref-api-url-help = Eagle 桌面端默认 API 地址为 http://localhost:41595。
+pref-api-token = Eagle API Token
+pref-api-token-help = 如果你的 Eagle 实例启用了访问令牌，这里需要填写。
+pref-eagle-folder = Eagle 文件夹 ID
+pref-eagle-folder-help = 可选。填写后，导入图片会放入对应 Eagle 文件夹。
+pref-test-connection = 测试连接
 pref-help = { $name } Build { $version } { $time }

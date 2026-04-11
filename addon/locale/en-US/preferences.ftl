@@ -1,5 +1,12 @@
-pref-title = Addon Template Example
-pref-enable =
-    .label = Enable
-pref-input = Input
+pref-title = Eagle Integration
+pref-auto-import =
+    .label = Automatically import new image annotations into Eagle
+pref-auto-import-help = When disabled, annotations can still be exported manually from the item context menu or Tools menu.
+pref-api-url = Eagle API URL
+pref-api-url-help = Default Eagle desktop API endpoint is http://localhost:41595.
+pref-api-token = Eagle API Token
+pref-api-token-help = Required when your Eagle instance is configured with an access token.
+pref-eagle-folder = Eagle Folder ID
+pref-eagle-folder-help = Optional. Imported images will be placed into this Eagle folder when provided.
+pref-test-connection = Test Connection
 pref-help = { $name } Build { $version } { $time }

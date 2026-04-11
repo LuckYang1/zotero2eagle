@@ -1,7 +1,7 @@
 {
   "name": "zotero2eagle",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.1.6",
   "description": "Export Zotero image annotations to Eagle with backlinks and metadata",
   "config": {
     "addonName": "Zotero2Eagle",

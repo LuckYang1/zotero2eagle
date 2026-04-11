@@ -3,6 +3,50 @@ import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
 import { logger } from "./utils/logger";
 
+let readerAnnotationMenuRegistered = false;
+
+const onCreateAnnotationContextMenu: _ZoteroTypes.Reader.EventHandler<"createAnnotationContextMenu"> =
+  (event) => {
+    try {
+      const selectedIDs = new Set([
+        ...event.params.ids,
+        event.params.currentID,
+      ].filter(Boolean));
+      const annotationItems = Zotero.Items.get(
+        event.reader.annotationItemIDs || [],
+      ) as Zotero.Item[];
+
+      event.append({
+        label: getString("menuitem-label"),
+        onCommand: () => {
+          const imageAnnotationItemIDs = annotationItems
+            .filter((item) => {
+              if (!(item.isAnnotation?.() && (item as any).annotationType === "image")) {
+                return false;
+              }
+
+              const readerAnnotation = event.reader._getAnnotation(item) as
+                | { id?: string; key?: string }
+                | null;
+              return (
+                selectedIDs.has(item.key) ||
+                selectedIDs.has(String(item.id)) ||
+                (!!readerAnnotation?.id && selectedIDs.has(readerAnnotation.id)) ||
+                (!!readerAnnotation?.key && selectedIDs.has(readerAnnotation.key))
+              );
+            })
+            .map((item) => item.id);
+
+          void addon.data.annotationExport.exportAnnotationIDs(
+            imageAnnotationItemIDs,
+          );
+        },
+      });
+    } catch (error) {
+      logger.error("hooks", "Failed to build annotation context menu", error);
+    }
+  };
+
 function registerPreferencePane() {
   Zotero.PreferencePanes.register({
     image: rootURI + "content/icons/favicon.png",
@@ -12,34 +56,17 @@ function registerPreferencePane() {
   });
 }
 
-function registerMenuEntries() {
-  if (addon.data.menusRegistered) {
+function registerReaderAnnotationMenu() {
+  if (readerAnnotationMenuRegistered) {
     return;
   }
 
-  ztoolkit.Menu.register("item", {
-    commandListener: () => {
-      void addon.data.annotationExport.exportSelected();
-    },
-    icon: `chrome://${addon.data.config.addonRef}/content/icons/favicon@0.5x.png`,
-    id: "zotero-itemmenu-zotero2eagle-export",
-    label: getString("menuitem-label"),
-    tag: "menuitem",
-  });
-
-  ztoolkit.Menu.register("menuTools", {
-    tag: "menu",
-    label: getString("menuitem-filemenulabel"),
-    children: [
-      {
-        tag: "menuitem",
-        label: getString("menuitem-label"),
-        oncommand: `void Zotero.${addon.data.config.addonInstance}.data.annotationExport.exportSelected();`,
-      },
-    ],
-  });
-
-  addon.data.menusRegistered = true;
+  Zotero.Reader.registerEventListener(
+    "createAnnotationContextMenu",
+    onCreateAnnotationContextMenu,
+    addon.data.config.addonID,
+  );
+  readerAnnotationMenuRegistered = true;
 }
 
 async function onStartup() {
@@ -62,6 +89,16 @@ async function onStartup() {
     logger.error("hooks", "Failed to initialize annotation export service", error);
   }
 
+  try {
+    registerReaderAnnotationMenu();
+  } catch (error) {
+    logger.error(
+      "hooks",
+      "Failed to register reader annotation context menu",
+      error,
+    );
+  }
+
   await Promise.allSettled(
     Zotero.getMainWindows().map((win) => onMainWindowLoad(win)),
   );
@@ -72,17 +109,19 @@ async function onStartup() {
 
 async function onMainWindowLoad(_win: _ZoteroTypes.MainWindow): Promise<void> {
   addon.data.ztoolkit = createZToolkit();
-  try {
-    registerMenuEntries();
-  } catch (error) {
-    logger.error("hooks", "Failed to register menu entries", error);
-  }
 }
 
 async function onMainWindowUnload(_win: Window): Promise<void> {}
 
 function onShutdown(): void {
   addon.data.annotationExport.shutdown();
+  if (readerAnnotationMenuRegistered) {
+    Zotero.Reader.unregisterEventListener(
+      "createAnnotationContextMenu",
+      onCreateAnnotationContextMenu,
+    );
+    readerAnnotationMenuRegistered = false;
+  }
   ztoolkit.unregisterAll();
   addon.data.alive = false;
   // @ts-expect-error - Plugin instance is not typed

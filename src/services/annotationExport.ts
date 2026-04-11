@@ -122,18 +122,13 @@ export class AnnotationExportService {
     const selectedItems = (pane?.getSelectedItems?.() || []) as Zotero.Item[];
     const annotations = await this.collectImageAnnotations(selectedItems);
 
-    if (!annotations.length) {
-      this.notify(getString("status-export-empty"), "warning");
-      return [];
-    }
+    return this.exportAnnotations(annotations, "manual");
+  }
 
-    const results: ExportResult[] = [];
-    for (const annotation of annotations) {
-      results.push(await this.exportAnnotation(annotation, "manual"));
-    }
-
-    this.notify(this.buildBatchSummary(results), this.getBatchNotificationType(results));
-    return results;
+  async exportAnnotationIDs(annotationIDs: number[]) {
+    const items = await Zotero.Items.getAsync(annotationIDs);
+    const annotations = items.filter((item) => isImageAnnotation(item));
+    return this.exportAnnotations(annotations, "manual");
   }
 
   private claimAutoExport(annotationKey: string) {
@@ -198,6 +193,30 @@ export class AnnotationExportService {
     }
 
     return [...annotations.values()];
+  }
+
+  private async exportAnnotations(
+    annotations: Zotero.Item[],
+    mode: ExportMode,
+  ) {
+    if (!annotations.length) {
+      this.notify(getString("status-export-empty"), "warning");
+      return [];
+    }
+
+    const results: ExportResult[] = [];
+    for (const annotation of annotations) {
+      results.push(await this.exportAnnotation(annotation, mode));
+    }
+
+    if (mode === "manual") {
+      this.notify(
+        this.buildBatchSummary(results),
+        this.getBatchNotificationType(results),
+      );
+    }
+
+    return results;
   }
 
   private async exportAnnotation(annotationItem: Zotero.Item, mode: ExportMode): Promise<ExportResult> {

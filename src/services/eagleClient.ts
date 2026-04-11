@@ -37,7 +37,8 @@ function sanitizeNameSegment(value: string) {
 }
 
 export function buildEagleFilename(metadata: MetadataSummary) {
-  const titlePart = sanitizeNameSegment(metadata.title || "Untitled") || "Untitled";
+  const titlePart =
+    sanitizeNameSegment(metadata.title || "Untitled") || "Untitled";
   const pagePart = metadata.page ? `p${metadata.page}` : "pNA";
   return `${titlePart}_${metadata.attachmentKey}_${pagePart}.png`;
 }
@@ -70,7 +71,11 @@ export function buildEagleAnnotation(metadata: MetadataSummary) {
 }
 
 function normalizeBaseUrl(rawUrl?: string) {
-  const baseUrl = (rawUrl || getPref("eagleApiUrl") || "http://localhost:41595").trim();
+  const baseUrl = (
+    rawUrl ||
+    getPref("eagleApiUrl") ||
+    "http://localhost:41595"
+  ).trim();
   return baseUrl.replace(/\/+$/, "");
 }
 
@@ -147,7 +152,12 @@ export async function addItemFromPath(
   requestOptions?: { apiUrl?: string; token?: string },
 ) {
   try {
-    const response = await request<{ data?: { id?: string }; itemId?: string; message?: string; status?: string }>(
+    const response = await request<{
+      data?: { id?: string };
+      itemId?: string;
+      message?: string;
+      status?: string;
+    }>(
       "POST",
       "/api/item/addFromPath",
       {

@@ -16,7 +16,10 @@ function getDataDirectory() {
       return dataDirFile.path;
     }
   } catch (error) {
-    logger.warn("annotation-image", `Unable to read Zotero data directory: ${String(error)}`);
+    logger.warn(
+      "annotation-image",
+      `Unable to read Zotero data directory: ${String(error)}`,
+    );
   }
 
   return null;
@@ -38,7 +41,10 @@ function getGroupPath(item: Zotero.Item) {
       return joinPath("groups", String(library.groupID));
     }
   } catch (error) {
-    logger.warn("annotation-image", `Unable to resolve group cache path: ${String(error)}`);
+    logger.warn(
+      "annotation-image",
+      `Unable to resolve group cache path: ${String(error)}`,
+    );
   }
 
   return null;
@@ -49,12 +55,16 @@ function getCacheCandidates(annotationItem: Zotero.Item) {
   const annotationKey = annotationItem.key;
 
   try {
-    const apiPath = (Zotero as any).Annotations?.getCacheImagePath?.(annotationItem);
+    const apiPath =
+      (Zotero as any).Annotations?.getCacheImagePath?.(annotationItem);
     if (typeof apiPath === "string" && apiPath.trim()) {
       candidates.add(apiPath);
     }
   } catch (error) {
-    logger.warn("annotation-image", `Primary cache image API failed: ${String(error)}`);
+    logger.warn(
+      "annotation-image",
+      `Primary cache image API failed: ${String(error)}`,
+    );
   }
 
   const dataDir = getDataDirectory();
@@ -99,7 +109,10 @@ function getPageNumber(annotationItem: Zotero.Item) {
       return position.page;
     }
   } catch (error) {
-    logger.warn("annotation-image", `Unable to parse annotation position: ${String(error)}`);
+    logger.warn(
+      "annotation-image",
+      `Unable to parse annotation position: ${String(error)}`,
+    );
   }
 
   return null;
@@ -151,7 +164,10 @@ export async function waitForAnnotationCachePath(
         lastSizes.set(candidate, size);
         stableSince.set(candidate, Date.now());
       } catch (error) {
-        logger.warn("annotation-image", `Cache probe failed for ${candidate}: ${String(error)}`);
+        logger.warn(
+          "annotation-image",
+          `Cache probe failed for ${candidate}: ${String(error)}`,
+        );
       }
     }
 

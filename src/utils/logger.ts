@@ -6,7 +6,12 @@ function format(scope: string, message: string) {
   return `[${config.addonName}:${scope}] ${message}`;
 }
 
-function write(level: LogLevel, scope: string, message: string, error?: unknown) {
+function write(
+  level: LogLevel,
+  scope: string,
+  message: string,
+  error?: unknown,
+) {
   const text = format(scope, message);
 
   if (level === "error") {
@@ -32,6 +37,11 @@ export const logger = {
     write("warn", scope, message);
   },
   error(scope: string, message: string, error?: unknown) {
-    write("error", scope, `${message}${error ? `: ${String(error)}` : ""}`, error);
+    write(
+      "error",
+      scope,
+      `${message}${error ? `: ${String(error)}` : ""}`,
+      error,
+    );
   },
 };

@@ -8,10 +8,9 @@ let readerAnnotationMenuRegistered = false;
 const onCreateAnnotationContextMenu: _ZoteroTypes.Reader.EventHandler<"createAnnotationContextMenu"> =
   (event) => {
     try {
-      const selectedIDs = new Set([
-        ...event.params.ids,
-        event.params.currentID,
-      ].filter(Boolean));
+      const selectedIDs = new Set(
+        [...event.params.ids, event.params.currentID].filter(Boolean),
+      );
       const annotationItems = Zotero.Items.get(
         event.reader.annotationItemIDs || [],
       ) as Zotero.Item[];
@@ -21,7 +20,12 @@ const onCreateAnnotationContextMenu: _ZoteroTypes.Reader.EventHandler<"createAnn
         onCommand: () => {
           const imageAnnotationItemIDs = annotationItems
             .filter((item) => {
-              if (!(item.isAnnotation?.() && (item as any).annotationType === "image")) {
+              if (
+                !(
+                  item.isAnnotation?.() &&
+                  (item as any).annotationType === "image"
+                )
+              ) {
                 return false;
               }
 
@@ -31,8 +35,10 @@ const onCreateAnnotationContextMenu: _ZoteroTypes.Reader.EventHandler<"createAnn
               return (
                 selectedIDs.has(item.key) ||
                 selectedIDs.has(String(item.id)) ||
-                (!!readerAnnotation?.id && selectedIDs.has(readerAnnotation.id)) ||
-                (!!readerAnnotation?.key && selectedIDs.has(readerAnnotation.key))
+                (!!readerAnnotation?.id &&
+                  selectedIDs.has(readerAnnotation.id)) ||
+                (!!readerAnnotation?.key &&
+                  selectedIDs.has(readerAnnotation.key))
               );
             })
             .map((item) => item.id);
@@ -86,7 +92,11 @@ async function onStartup() {
   try {
     addon.data.annotationExport.init();
   } catch (error) {
-    logger.error("hooks", "Failed to initialize annotation export service", error);
+    logger.error(
+      "hooks",
+      "Failed to initialize annotation export service",
+      error,
+    );
   }
 
   try {

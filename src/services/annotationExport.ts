@@ -21,7 +21,11 @@ interface ExportJob {
 type ExportMode = "auto" | "manual";
 
 function isPdfAttachment(item: Zotero.Item) {
-  return item.isPDFAttachment?.() || (item.isAttachment() && item.attachmentContentType === "application/pdf");
+  return (
+    item.isPDFAttachment?.() ||
+    (item.isAttachment() &&
+      item.attachmentContentType === "application/pdf")
+  );
 }
 
 function isImageAnnotation(item: Zotero.Item) {
@@ -29,7 +33,8 @@ function isImageAnnotation(item: Zotero.Item) {
 }
 
 function getActivePane() {
-  return ((Zotero as any).getActiveZoteroPane?.() || ztoolkit.getGlobal("ZoteroPane")) as any;
+  return ((Zotero as any).getActiveZoteroPane?.() ||
+    ztoolkit.getGlobal("ZoteroPane")) as any;
 }
 
 async function coerceItems(values: Array<number | Zotero.Item>) {
@@ -57,7 +62,11 @@ function getCreators(item?: Zotero.Item | null) {
   return item
     .getCreators()
     .filter((creator: any) => creator.creatorType === "author")
-    .map((creator: any) => creator.name || [creator.firstName, creator.lastName].filter(Boolean).join(" "))
+    .map(
+      (creator: any) =>
+        creator.name ||
+        [creator.firstName, creator.lastName].filter(Boolean).join(" "),
+    )
     .filter(Boolean);
 }
 
@@ -86,8 +95,16 @@ export class AnnotationExportService {
 
     this.autoExportObserverID = Zotero.Notifier.registerObserver(
       {
-        notify: async (event: string, type: string, ids: Array<string | number>) => {
-          if (event !== "add" || type !== "item" || !getPref("enableAutoImport")) {
+        notify: async (
+          event: string,
+          type: string,
+          ids: Array<string | number>,
+        ) => {
+          if (
+            event !== "add" ||
+            type !== "item" ||
+            !getPref("enableAutoImport")
+          ) {
             return;
           }
 
@@ -219,11 +236,18 @@ export class AnnotationExportService {
     return results;
   }
 
-  private async exportAnnotation(annotationItem: Zotero.Item, mode: ExportMode): Promise<ExportResult> {
+  private async exportAnnotation(
+    annotationItem: Zotero.Item,
+    mode: ExportMode,
+  ): Promise<ExportResult> {
     try {
       const job = await this.buildJob(annotationItem);
       if (!job) {
-        const result = this.failResult(annotationItem.key, mode, "Annotation image cache was not available");
+        const result = this.failResult(
+          annotationItem.key,
+          mode,
+          "Annotation image cache was not available",
+        );
         if (mode === "auto") {
           this.notify(result.message, "error");
         }
@@ -236,9 +260,16 @@ export class AnnotationExportService {
       );
 
       if (!response.success) {
-        const result = this.failResult(annotationItem.key, mode, response.message);
+        const result = this.failResult(
+          annotationItem.key,
+          mode,
+          response.message,
+        );
         if (mode === "auto") {
-          this.notify(`${getString("status-export-failed")} ${response.message}`, "error");
+          this.notify(
+            `${getString("status-export-failed")} ${response.message}`,
+            "error",
+          );
         }
         return result;
       }
@@ -252,7 +283,10 @@ export class AnnotationExportService {
       };
 
       if (mode === "auto") {
-        this.notify(`${getString("status-export-success")} ${job.metadata.title}`, "success");
+        this.notify(
+          `${getString("status-export-success")} ${job.metadata.title}`,
+          "success",
+        );
       }
 
       return result;
@@ -260,13 +294,18 @@ export class AnnotationExportService {
       logger.error("annotation-export", "Unexpected export failure", error);
       const result = this.failResult(annotationItem.key, mode, String(error));
       if (mode === "auto") {
-        this.notify(`${getString("status-export-failed")} ${String(error)}`, "error");
+        this.notify(
+          `${getString("status-export-failed")} ${String(error)}`,
+          "error",
+        );
       }
       return result;
     }
   }
 
-  private async buildJob(annotationItem: Zotero.Item): Promise<ExportJob | null> {
+  private async buildJob(
+    annotationItem: Zotero.Item,
+  ): Promise<ExportJob | null> {
     const attachmentItem = annotationItem.parentItem;
     if (!attachmentItem) {
       return null;
@@ -275,7 +314,10 @@ export class AnnotationExportService {
     const bibliographicItem = attachmentItem.parentItem || attachmentItem;
     const cachePath = await waitForAnnotationCachePath(annotationItem);
     if (!cachePath) {
-      logger.warn("annotation-export", `No cache image found for annotation ${annotationItem.key}`);
+      logger.warn(
+        "annotation-export",
+        `No cache image found for annotation ${annotationItem.key}`,
+      );
       return null;
     }
 
@@ -328,7 +370,11 @@ export class AnnotationExportService {
     return "error" as const;
   }
 
-  private failResult(annotationKey: string, mode: ExportMode, message: string): ExportResult {
+  private failResult(
+    annotationKey: string,
+    mode: ExportMode,
+    message: string,
+  ): ExportResult {
     return {
       annotationKey,
       message,

@@ -31,11 +31,13 @@ function setStatus(message: string, color: string) {
 }
 
 async function updatePrefsUI() {
-  getInputElement(prefId("auto-import"))!.checked = !!getPref("enableAutoImport");
+  getInputElement(prefId("auto-import"))!.checked =
+    !!getPref("enableAutoImport");
   getInputElement(prefId("api-url"))!.value =
     getPref("eagleApiUrl") || "http://localhost:41595";
   getInputElement(prefId("api-token"))!.value = getPref("eagleApiToken") || "";
-  getInputElement(prefId("eagle-folder"))!.value = getPref("eagleFolderId") || "";
+  getInputElement(prefId("eagle-folder"))!.value =
+    getPref("eagleFolderId") || "";
 }
 
 function bindPrefEvents() {
@@ -53,17 +55,26 @@ function bindPrefEvents() {
     },
   );
 
-  getInputElement(prefId("api-url"))?.addEventListener("input", (event: Event) => {
-    setPref("eagleApiUrl", (event.target as HTMLInputElement).value);
-  });
+  getInputElement(prefId("api-url"))?.addEventListener(
+    "input",
+    (event: Event) => {
+      setPref("eagleApiUrl", (event.target as HTMLInputElement).value);
+    },
+  );
 
-  getInputElement(prefId("api-token"))?.addEventListener("input", (event: Event) => {
-    setPref("eagleApiToken", (event.target as HTMLInputElement).value);
-  });
+  getInputElement(prefId("api-token"))?.addEventListener(
+    "input",
+    (event: Event) => {
+      setPref("eagleApiToken", (event.target as HTMLInputElement).value);
+    },
+  );
 
-  getInputElement(prefId("eagle-folder"))?.addEventListener("input", (event: Event) => {
-    setPref("eagleFolderId", (event.target as HTMLInputElement).value);
-  });
+  getInputElement(prefId("eagle-folder"))?.addEventListener(
+    "input",
+    (event: Event) => {
+      setPref("eagleFolderId", (event.target as HTMLInputElement).value);
+    },
+  );
 
   getDocument()
     ?.getElementById(buttonId("test-connection"))

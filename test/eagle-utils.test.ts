@@ -32,10 +32,7 @@ describe("eagle export helpers", function () {
   });
 
   it("should build stable eagle tags", function () {
-    assert.deepEqual(buildEagleTags(sampleMetadata), [
-      "Zotero",
-      "Lovelace",
-    ]);
+    assert.deepEqual(buildEagleTags(sampleMetadata), ["Zotero", "Lovelace"]);
   });
 
   it("should build eagle annotation text", function () {

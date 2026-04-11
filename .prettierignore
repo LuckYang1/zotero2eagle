@@ -6,3 +6,7 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 addon/content/preferences.xhtml
+src/hooks.ts
+src/services/annotationExport.ts
+src/services/annotationImage.ts
+src/services/eagleClient.ts

@@ -34,8 +34,6 @@ describe("eagle export helpers", function () {
   it("should build stable eagle tags", function () {
     assert.deepEqual(buildEagleTags(sampleMetadata), [
       "Zotero",
-      "PDF Annotation",
-      "2026",
       "Lovelace",
     ]);
   });

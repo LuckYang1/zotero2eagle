@@ -43,11 +43,7 @@ export function buildEagleFilename(metadata: MetadataSummary) {
 }
 
 export function buildEagleTags(metadata: MetadataSummary) {
-  const tags = ["Zotero", "PDF Annotation"];
-
-  if (metadata.year) {
-    tags.push(metadata.year);
-  }
+  const tags = ["Zotero"];
 
   const firstAuthor = metadata.authors[0]?.trim();
   if (firstAuthor) {

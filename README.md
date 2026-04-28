@@ -20,6 +20,26 @@ Zotero2Eagle is a Zotero 9 plugin that exports PDF image annotations to Eagle an
 - Support automatic import for newly created image annotations
 - Support manual export for selected annotations, PDF attachments, or top-level items
 
+## Demo
+
+### Auto Import
+
+![Auto Import](<doc/data/自动导入%20(1).gif>)
+
+Create a new image annotation in Zotero PDF — it will be automatically imported into Eagle.
+
+### Manual Export
+
+![Manual Export](doc/data/手动导入.gif)
+
+Select one or more image annotations, right-click, and export to Eagle.
+
+### Backlinks & Auto Tags
+
+![Backlinks & Auto Tags](doc/data/双向链接已经自动标签.gif)
+
+Each imported item in Eagle includes a `zotero://` backlink and auto-generated tags (title, authors, year, page number, etc.).
+
 ## Configuration
 
 Open `Preferences -> Zotero2Eagle` and configure:

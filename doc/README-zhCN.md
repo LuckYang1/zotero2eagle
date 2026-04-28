@@ -112,5 +112,23 @@ npm test
 
 ## 发布
 
-- 当前版本：`v0.1.6`
+- 当前版本：`v0.1.7`
 - Release note：[GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
+
+## 贡献
+
+1. Fork 本仓库
+2. 创建一个功能分支
+3. 遵循 [DEVELOPMENT.md](DEVELOPMENT.md) 中的编码指南进行更改
+4. 为新功能添加测试
+5. 提交一个 Pull Request
+
+## 许可证
+
+本项目基于 AGPL 许可证授权 - 详情请参阅 [LICENSE](../LICENSE) 文件。
+
+## 致谢
+
+基于 [@windingwind](https://github.com/windingwind) 的 [Zotero 插件模板](https://github.com/windingwind/zotero-plugin-template) 构建。
+
+[![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)

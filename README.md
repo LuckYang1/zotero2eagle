@@ -46,7 +46,7 @@ npm test
 
 ## Release
 
-Current version: `v0.1.6`
+Current version: `v0.1.7`
 
 - Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
@@ -54,3 +54,21 @@ Current version: `v0.1.6`
 
 - This project uses the Zotero plugin scaffold and runs as a Zotero plugin, not as an Eagle plugin.
 - Eagle integration is executed from Zotero through Eagle's local HTTP API. Note that the local HTTP API uses `folderId` for the destination folder, while the Eagle Plugin API uses `folders`.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes following the coding guidelines in [DEVELOPMENT.md](doc/DEVELOPMENT.md)
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+This project is licensed under the AGPL License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+Built with the [Zotero Plugin Template](https://github.com/windingwind/zotero-plugin-template) by [@windingwind](https://github.com/windingwind).
+
+[![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)

@@ -1,12 +1,14 @@
 # Zotero2Eagle
 
 <p align="center">
-  <img src="addon/content/icons/zotero2eagle.png" alt="Zotero2Eagle Logo" width="128"/>
+  <img src="../addon/content/icons/zotero2eagle.png" alt="Zotero2Eagle Logo" width="128"/>
 </p>
 
 [![zotero target version](https://img.shields.io/badge/Zotero-8%20or%209-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org)
 
 Zotero2Eagle 是一个面向 Zotero 9 的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。
+
+本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
 ## 功能
 
@@ -110,5 +112,5 @@ npm test
 
 ## 发布
 
-- 当前版本：`v0.1.1`
-- Release note：[`doc/RELEASE-v0.1.1.md`](./RELEASE-v0.1.1.md)
+- 当前版本：`v0.1.6`
+- Release note：[GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)

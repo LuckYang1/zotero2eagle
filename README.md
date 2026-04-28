@@ -10,6 +10,8 @@ Zotero2Eagle is a Zotero 9 plugin that exports PDF image annotations to Eagle an
 
 [简体中文说明](./doc/README-zhCN.md)
 
+本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
+
 ## Features
 
 - Export image annotations from Zotero PDFs into Eagle
@@ -44,10 +46,9 @@ npm test
 
 ## Release
 
-Current release target: `v0.1.1`
+Current version: `v0.1.6`
 
-- Release notes: [doc/RELEASE-v0.1.1.md](./doc/RELEASE-v0.1.1.md)
-- Tag name: `v0.1.1`
+- Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
 ## Notes
 

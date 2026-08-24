@@ -4,9 +4,9 @@
   <img src="../addon/content/icons/zotero2eagle.png" alt="Zotero2Eagle Logo" width="128"/>
 </p>
 
-[![zotero target version](https://img.shields.io/badge/Zotero-8%20or%209-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![zotero target version](https://img.shields.io/badge/Zotero-9%20or%2010-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-Zotero2Eagle 是一个面向 Zotero 9 的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。
+Zotero2Eagle 是一个面向 Zotero 9 和 10 的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。
 
 本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
@@ -69,7 +69,7 @@ npm start
 npm run build
 ```
 
-2. 使用 `zotero-plugin-scaffold` 的 release 流程生成 `.xpi`，或将构建后的 addon 用临时扩展方式加载到 Zotero 9。
+2. 使用 `zotero-plugin-scaffold` 的 release 流程生成 `.xpi`，或将构建后的 addon 用临时扩展方式加载到 Zotero 9 或 10。
 
 ## 配置
 

@@ -4,9 +4,9 @@
   <img src="addon/content/icons/zotero2eagle.png" alt="Zotero2Eagle Logo" width="128"/>
 </p>
 
-[![zotero target version](https://img.shields.io/badge/Zotero-8%20or%209-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
+[![zotero target version](https://img.shields.io/badge/Zotero-9%20or%2010-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-Zotero2Eagle is a Zotero 9 plugin that exports PDF image annotations to Eagle and preserves a backlink to the source PDF.
+Zotero2Eagle is a Zotero 9 and 10 plugin that exports PDF image annotations to Eagle and preserves a backlink to the source PDF.
 
 [简体中文说明](./doc/README-zhCN.md)
 

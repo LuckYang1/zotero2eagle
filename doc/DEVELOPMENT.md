@@ -1,11 +1,11 @@
 # Zotero2Eagle 开发指南
 
-Zotero2Eagle 是一个 Zotero 9 插件，将 Zotero PDF 中的图片标注导出到 Eagle，并保留 `zotero://open-pdf/...` 回链。
+Zotero2Eagle 是一个 Zotero 9 和 10 插件，将 Zotero PDF 中的图片标注导出到 Eagle，并保留 `zotero://open-pdf/...` 回链。
 
 ## 环境要求
 
 - **Node.js** ≥ 18
-- **Zotero** 9.x
+- **Zotero** 9.x 或 10.0.x
 - **Eagle**（本地运行，HTTP API 默认端口 `41595`）
 
 ## 项目结构

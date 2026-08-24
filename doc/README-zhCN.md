@@ -132,7 +132,7 @@ npm test
 
 ## 发布
 
-- 当前版本：`v0.1.7`
+- 当前版本：`v0.1.8`
 - Release note：[GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
 ## 贡献

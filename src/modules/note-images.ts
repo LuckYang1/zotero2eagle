@@ -8,6 +8,8 @@ export interface NoteImageRecord {
   noteKey: string;
   noteTitle: string;
   filename: string;
+  dateAdded?: string;
+  dateModified?: string;
   filePath: string | null;
   imageURI: string | null;
   collectionIDs: number[];
@@ -116,6 +118,8 @@ export async function collectNoteImages(): Promise<NoteImageRecord[]> {
       noteKey: note.key,
       noteTitle: note.getDisplayTitle() || note.key,
       filename: item.attachmentFilename || "image.png",
+      dateAdded: item.dateAdded || "",
+      dateModified: item.dateModified || "",
       filePath,
       imageURI: filePath ? Zotero.File.pathToFileURI(filePath) : null,
       collectionIDs: top.getCollections?.() ?? [],

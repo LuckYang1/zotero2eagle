@@ -82,7 +82,9 @@ class OverviewController {
     this.getElement<HTMLButtonElement>(
       "zotero2eagle-image-manager-select-all",
     ).addEventListener("click", () => {
-      this.selected = new Set(this.getVisibleRecords().map(recordIdentity));
+      const visibleIds = this.getVisibleRecords().map(recordIdentity);
+      const allSelected = visibleIds.every((id) => this.selected.has(id));
+      this.selected = allSelected ? new Set() : new Set(visibleIds);
       this.render();
     });
     this.getElement<HTMLButtonElement>(
@@ -139,8 +141,10 @@ class OverviewController {
       "zotero2eagle-image-manager-sort-menu",
     );
     const sortLabel = getString("overview-sort-field");
-    sortFieldButton.title = sortLabel;
     sortFieldButton.setAttribute("aria-label", sortLabel);
+    this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-sort-field-tooltip",
+    ).textContent = sortLabel;
     this.updateSortFieldMenu();
     sortFieldButton.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -338,8 +342,10 @@ class OverviewController {
       icon.src = `chrome://${config.addonRef}/content/icons/arrow-${order === "asc" ? "up" : "down"}.svg`;
     }
     button.dataset.order = order;
-    button.title = label;
     button.setAttribute("aria-label", label);
+    this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-sort-order-tooltip",
+    ).textContent = label;
   }
 
   private updateSortFieldMenu() {
@@ -389,8 +395,22 @@ class OverviewController {
     button("restore").disabled = this.busy || !count;
     button("delete-forever").disabled = this.busy || !count;
     button("empty-trash").disabled = this.busy || !this.getViewRecords().length;
-    button("select-all").disabled =
-      this.busy || !this.getVisibleRecords().length;
+    const visibleRecords = this.getVisibleRecords();
+    const allSelected =
+      visibleRecords.length > 0 &&
+      visibleRecords.every((record) => this.selected.has(recordIdentity(record)));
+    const selectAllButton = button("select-all");
+    selectAllButton.disabled = this.busy || !visibleRecords.length;
+    selectAllButton.setAttribute("aria-pressed", String(allSelected));
+    const selectAllLabel = getString(
+      allSelected
+        ? "overview-deselect-visible-icon"
+        : "overview-select-visible-icon",
+    );
+    selectAllButton.setAttribute("aria-label", selectAllLabel);
+    this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-select-all-tooltip",
+    ).textContent = selectAllLabel;
     this.getElement<HTMLElement>(
       "zotero2eagle-image-manager-selected-count",
     ).textContent = getString("overview-selected-count", { args: { count } });

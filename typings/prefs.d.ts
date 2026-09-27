@@ -12,6 +12,7 @@ declare namespace _ZoteroTypes {
       "eagleApiToken": string;
       "eagleFolderId": string;
       "thumbnailSize": number;
+      "noteThumbnailSize": number;
       "showFileSize": boolean;
       "showModifiedTime": boolean;
       "defaultSortField": string;

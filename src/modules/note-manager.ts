@@ -1,4 +1,5 @@
 import { getString } from "../utils/locale";
+import { config } from "../../package.json";
 import { exportNoteImages } from "../services/noteImageExport";
 import {
   collectNoteImages,
@@ -10,7 +11,11 @@ import {
 } from "./note-images";
 import { readNoteTrashEntries, reconcileTrashEntries, recordIdentity, writeNoteTrashEntries, type TrashEntry } from "./image-manager-trash";
 import { showImagePreview } from "./image-preview";
-import { getPref } from "../utils/prefs";
+import { getPref, setPref } from "../utils/prefs";
+import {
+  clampThumbnailSize,
+  setThumbnailSizeStyle,
+} from "./overview-filters";
 
 const NS = "http://www.w3.org/1999/xhtml";
 type ReferenceFilter = "all" | "referenced" | "unreferenced";
@@ -24,6 +29,12 @@ export class NoteManager {
   private references: Map<string, NoteReference[]> | null = null;
   private view: "library" | "trash" = "library";
   private query = "";
+  private sortField =
+    getPref("defaultSortField") === "color"
+      ? "dateModified"
+      : getPref("defaultSortField") || "dateModified";
+  private sortOrder = getPref("defaultSortOrder") || "desc";
+  private thumbnailSize = clampThumbnailSize(getPref("noteThumbnailSize"));
   private collection = "all";
   private collectionOptions: DropdownOption[] = [];
   private referenceFilter: ReferenceFilter = "all";
@@ -49,6 +60,14 @@ export class NoteManager {
     this.initFilterDropdown("collection");
     this.initFilterDropdown("reference-filter");
     this.renderFilterDropdown("reference-filter");
+    this.initSortControls();
+    this.input("size").value = String(this.thumbnailSize);
+    setThumbnailSizeStyle(this.element("grid"), this.thumbnailSize);
+    this.input("size").addEventListener("input", () => {
+      this.thumbnailSize = clampThumbnailSize(Number(this.input("size").value));
+      setPref("noteThumbnailSize", this.thumbnailSize);
+      setThumbnailSizeStyle(this.element("grid"), this.thumbnailSize);
+    });
     this.button("refresh").addEventListener("click", () => void this.reload());
     this.button("library").addEventListener("click", () =>
       this.switchView("library"),
@@ -58,7 +77,9 @@ export class NoteManager {
     );
     this.button("scan").addEventListener("click", () => void this.scan());
     this.button("select-all").addEventListener("click", () => {
-      this.selected = new Set(this.visible().map(recordIdentity));
+      const visibleIds = this.visible().map(recordIdentity);
+      const allSelected = visibleIds.every((id) => this.selected.has(id));
+      this.selected = allSelected ? new Set() : new Set(visibleIds);
       this.render();
     });
     this.button("save").addEventListener(
@@ -83,7 +104,10 @@ export class NoteManager {
       this.query = this.input("search").value;
       this.render();
     });
-    this.win.document.addEventListener("click", () => this.hideMenu());
+    this.win.document.addEventListener("click", () => {
+      this.hideMenu();
+      this.hideSortMenu();
+    });
     this.win.document.addEventListener("click", (event) => {
       const target = event.target as Node;
       for (const name of ["collection", "reference-filter"] as const) {
@@ -92,9 +116,76 @@ export class NoteManager {
       }
     });
     this.win.document.addEventListener("keydown", (event) => {
-      if ((event as KeyboardEvent).key === "Escape") this.hideMenu();
+      if ((event as KeyboardEvent).key === "Escape") {
+        this.hideMenu();
+        this.hideSortMenu();
+      }
     });
     await this.reload();
+  }
+
+  private initSortControls() {
+    const fieldButton = this.button("sort-field");
+    const menu = this.element("sort-menu");
+    const fieldLabel = getString("overview-sort-field");
+    fieldButton.setAttribute("aria-label", fieldLabel);
+    this.element("sort-field-tooltip").textContent = fieldLabel;
+    this.updateSortFieldMenu();
+    fieldButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      menu.hidden = !menu.hidden;
+      fieldButton.setAttribute("aria-expanded", String(!menu.hidden));
+      if (!menu.hidden) {
+        menu.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
+      }
+    });
+    for (const option of menu.querySelectorAll<HTMLButtonElement>(
+      "[data-sort-field]",
+    )) {
+      option.addEventListener("click", (event: Event) => {
+        event.stopPropagation();
+        this.sortField = option.dataset.sortField || "dateModified";
+        this.updateSortFieldMenu();
+        this.hideSortMenu();
+        fieldButton.focus();
+        this.render();
+      });
+    }
+    this.updateSortOrderButton();
+    this.button("sort-order").addEventListener("click", () => {
+      this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
+      this.updateSortOrderButton();
+      this.render();
+    });
+  }
+
+  private updateSortFieldMenu() {
+    for (const option of this.element("sort-menu").querySelectorAll<HTMLButtonElement>(
+      "[data-sort-field]",
+    )) {
+      option.setAttribute(
+        "aria-checked",
+        String(option.dataset.sortField === this.sortField),
+      );
+    }
+  }
+
+  private updateSortOrderButton() {
+    const button = this.button("sort-order");
+    const order = this.sortOrder === "asc" ? "asc" : "desc";
+    const label = getString(`overview-sort-${order}`);
+    const icon = button.querySelector<HTMLImageElement>("img");
+    if (icon) {
+      icon.src = `chrome://${config.addonRef}/content/icons/arrow-${order === "asc" ? "up" : "down"}.svg`;
+    }
+    button.dataset.order = order;
+    button.setAttribute("aria-label", label);
+    this.element("sort-order-tooltip").textContent = label;
+  }
+
+  private hideSortMenu() {
+    this.element("sort-menu").hidden = true;
+    this.button("sort-field").setAttribute("aria-expanded", "false");
   }
 
   teardown() {
@@ -102,6 +193,7 @@ export class NoteManager {
       this.win.clearTimeout(this.previewClickTimer);
     this.loadVersion += 1;
     this.hideMenu();
+    this.hideSortMenu();
     this.closeFilterDropdown("collection");
     this.closeFilterDropdown("reference-filter");
     this.element("grid").replaceChildren();
@@ -366,26 +458,27 @@ export class NoteManager {
       }
     }
 
-    const sortField = getPref("defaultSortField") || "dateModified";
-    const sortOrder = getPref("defaultSortOrder") || "desc";
-
     filtered.sort((a, b) => {
-      let cmp = 0;
-      switch (sortField) {
+      let cmp: number;
+      switch (this.sortField) {
         case "title":
           cmp = (a.noteTitle || "").localeCompare(b.noteTitle || "");
           break;
+        case "filename":
+          cmp = a.filename.localeCompare(b.filename);
+          break;
         case "dateAdded":
-        case "color":
+          cmp = (a.dateAdded || "").localeCompare(b.dateAdded || "");
+          break;
         case "dateModified":
         default:
-          cmp = 0; // Note manager doesn't track dates/colors, fallback to stable
+          cmp = (a.dateModified || "").localeCompare(b.dateModified || "");
           break;
       }
       if (cmp === 0) {
         cmp = a.key.localeCompare(b.key);
       }
-      return sortOrder === "asc" ? cmp : -cmp;
+      return this.sortOrder === "asc" ? cmp : -cmp;
     });
 
     return filtered;
@@ -787,7 +880,20 @@ export class NoteManager {
       this.button(name).disabled = this.busy || !this.selected.size;
     this.button("empty-trash").disabled =
       this.busy || !this.viewRecords().length;
-    this.button("select-all").disabled = this.busy || !this.visible().length;
+    const visible = this.visible();
+    const allSelected =
+      visible.length > 0 &&
+      visible.every((record) => this.selected.has(recordIdentity(record)));
+    const selectAllButton = this.button("select-all");
+    selectAllButton.disabled = this.busy || !visible.length;
+    selectAllButton.setAttribute("aria-pressed", String(allSelected));
+    const selectAllLabel = getString(
+      allSelected
+        ? "overview-deselect-visible-icon"
+        : "overview-select-visible-icon",
+    );
+    selectAllButton.setAttribute("aria-label", selectAllLabel);
+    this.element("select-all-tooltip").textContent = selectAllLabel;
     this.button("scan").disabled = this.busy;
     this.element("selected-count").textContent = getString(
       "overview-selected-count",

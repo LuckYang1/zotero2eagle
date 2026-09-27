@@ -13,7 +13,7 @@
     <html:link
       id="zotero2eagle-overview-stylesheet"
       rel="stylesheet"
-      href="chrome://__addonRef__/content/overview.css?revision=sort-icons-3"
+      href="chrome://__addonRef__/content/overview.css?revision=note-toolbar-controls-1"
     />
   </linkset>
 
@@ -116,142 +116,173 @@
       </html:aside>
 
       <html:section class="figure-content">
-        <html:div class="figure-toolbar">
-          <html:input
-            id="zotero2eagle-image-manager-search"
-            class="figure-search"
-            type="search"
-            data-l10n-id="overview-search-pdf"
-            data-l10n-attrs="placeholder"
-          />
-          <html:div class="figure-toolbar-group figure-sort-controls">
-            <html:button
-              id="zotero2eagle-image-manager-sort-field"
-              class="figure-button figure-sort-button"
-              type="button"
-              aria-label="排序方式"
-              aria-haspopup="menu"
-              aria-expanded="false"
-              title="排序方式"
-            >
-              <html:img
-                src="chrome://__addonRef__/content/icons/filter.svg"
-                alt=""
-              />
-            </html:button>
-            <html:div
-              id="zotero2eagle-image-manager-sort-menu"
-              class="figure-sort-menu"
-              role="menu"
-              hidden="hidden"
-            >
-              <html:button
-                type="button"
-                role="menuitemradio"
-                data-sort-field="dateModified"
-                data-l10n-id="overview-sort-modified"
-              ></html:button>
-              <html:button
-                type="button"
-                role="menuitemradio"
-                data-sort-field="dateAdded"
-                data-l10n-id="overview-sort-added"
-              ></html:button>
-              <html:button
-                type="button"
-                role="menuitemradio"
-                data-sort-field="title"
-                data-l10n-id="overview-sort-title"
-              ></html:button>
-              <html:button
-                type="button"
-                role="menuitemradio"
-                data-sort-field="color"
-                data-l10n-id="overview-sort-color"
-              ></html:button>
+        <html:div class="figure-toolbar figure-toolbar-two-row">
+          <html:div class="figure-toolbar-row figure-toolbar-primary">
+            <html:input
+              id="zotero2eagle-image-manager-search"
+              class="figure-search"
+              type="search"
+              data-l10n-id="overview-search-pdf"
+              data-l10n-attrs="placeholder"
+            />
+            <html:div class="figure-toolbar-buttons">
+              <html:div class="figure-toolbar-group figure-sort-controls">
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-image-manager-sort-field"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="排序方式"
+                    aria-haspopup="menu"
+                    aria-expanded="false"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/filter.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-image-manager-sort-field-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+                <html:div
+                  id="zotero2eagle-image-manager-sort-menu"
+                  class="figure-sort-menu"
+                  role="menu"
+                  hidden="hidden"
+                >
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="dateModified"
+                    data-l10n-id="overview-sort-modified"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="dateAdded"
+                    data-l10n-id="overview-sort-added"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="title"
+                    data-l10n-id="overview-sort-title"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="color"
+                    data-l10n-id="overview-sort-color"
+                  ></html:button>
+                </html:div>
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-image-manager-sort-order"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="降序"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/arrow-down.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-image-manager-sort-order-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+              </html:div>
+              <html:div class="figure-toolbar-group figure-actions">
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-image-manager-select-all"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="全选当前可见图标"
+                    aria-pressed="false"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/select-visible.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-image-manager-select-all-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+                <html:button
+                  id="zotero2eagle-image-manager-save"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-save-eagle"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-image-manager-move-trash"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-move-trash"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-image-manager-restore"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-restore"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-image-manager-delete-forever"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-delete-forever"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-image-manager-empty-trash"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-empty-trash"
+                ></html:button>
+              </html:div>
             </html:div>
-            <html:button
-              id="zotero2eagle-image-manager-sort-order"
-              class="figure-button figure-sort-button"
-              type="button"
-              aria-label="降序"
-              title="降序"
-            >
-              <html:img
-                src="chrome://__addonRef__/content/icons/arrow-down.svg"
-                alt=""
-              />
-            </html:button>
-          </html:div>
-          <html:div class="figure-toolbar-group figure-actions">
-            <html:button
-              id="zotero2eagle-image-manager-select-all"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-select-all"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-image-manager-save"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-save-eagle"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-image-manager-move-trash"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-move-trash"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-image-manager-restore"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-restore"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-image-manager-delete-forever"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-delete-forever"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-image-manager-empty-trash"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-empty-trash"
-            ></html:button>
             <html:span
               id="zotero2eagle-image-manager-selected-count"
-              class="figure-count"
+              class="figure-count figure-toolbar-selected-count"
             ></html:span>
           </html:div>
-          <html:div class="figure-toolbar-group">
-            <html:span
-              class="figure-filter-label"
-              data-l10n-id="overview-colors"
-            ></html:span>
+          <html:div class="figure-toolbar-row figure-toolbar-secondary">
+            <html:div class="figure-toolbar-group figure-toolbar-colors">
+              <html:span
+                class="figure-filter-label"
+                data-l10n-id="overview-colors"
+              ></html:span>
+              <html:div
+                id="zotero2eagle-image-manager-colors"
+                class="figure-color-list"
+              ></html:div>
+            </html:div>
+            <html:label class="figure-size-control">
+              <html:span
+                class="figure-filter-label"
+                data-l10n-id="overview-size"
+              ></html:span>
+              <html:input
+                id="zotero2eagle-image-manager-size"
+                type="range"
+                min="140"
+                max="420"
+                step="20"
+              />
+            </html:label>
             <html:div
-              id="zotero2eagle-image-manager-colors"
-              class="figure-color-list"
+              id="zotero2eagle-image-manager-count"
+              class="figure-count figure-toolbar-image-count"
             ></html:div>
           </html:div>
-          <html:label class="figure-size-control">
-            <html:span
-              class="figure-filter-label"
-              data-l10n-id="overview-size"
-            ></html:span>
-            <html:input
-              id="zotero2eagle-image-manager-size"
-              type="range"
-              min="140"
-              max="420"
-              step="20"
-            />
-          </html:label>
-          <html:div
-            id="zotero2eagle-image-manager-count"
-            class="figure-count"
-          ></html:div>
         </html:div>
         <html:div
           id="zotero2eagle-image-manager-status"
@@ -431,60 +462,163 @@
         ></html:div>
       </html:aside>
       <html:section class="figure-content">
-        <html:div class="figure-toolbar">
-          <html:input
-            id="zotero2eagle-note-search"
-            class="figure-search"
-            type="search"
-            data-l10n-id="overview-search-note"
-            data-l10n-attrs="placeholder"
-          />
-          <html:div class="figure-toolbar-group figure-actions">
-            <html:button
-              id="zotero2eagle-note-select-all"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-select-all"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-note-save"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-save-eagle"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-note-move-trash"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-move-trash"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-note-restore"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-restore"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-note-delete-forever"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-delete-forever"
-            ></html:button>
-            <html:button
-              id="zotero2eagle-note-empty-trash"
-              class="figure-button figure-button-compact"
-              type="button"
-              data-l10n-id="overview-empty-trash"
-            ></html:button>
+        <html:div class="figure-toolbar figure-toolbar-two-row">
+          <html:div class="figure-toolbar-row figure-toolbar-primary">
+            <html:input
+              id="zotero2eagle-note-search"
+              class="figure-search"
+              type="search"
+              data-l10n-id="overview-search-note"
+              data-l10n-attrs="placeholder"
+            />
+            <html:div class="figure-toolbar-buttons">
+              <html:div class="figure-toolbar-group figure-sort-controls">
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-note-sort-field"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="排序方式"
+                    aria-haspopup="menu"
+                    aria-expanded="false"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/filter.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-note-sort-field-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+                <html:div
+                  id="zotero2eagle-note-sort-menu"
+                  class="figure-sort-menu"
+                  role="menu"
+                  hidden="hidden"
+                >
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="dateModified"
+                    data-l10n-id="overview-sort-modified"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="dateAdded"
+                    data-l10n-id="overview-sort-added"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="title"
+                    data-l10n-id="overview-sort-title"
+                  ></html:button>
+                  <html:button
+                    type="button"
+                    role="menuitemradio"
+                    data-sort-field="filename"
+                    data-l10n-id="overview-sort-filename"
+                  ></html:button>
+                </html:div>
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-note-sort-order"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="降序"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/arrow-down.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-note-sort-order-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+              </html:div>
+              <html:div class="figure-toolbar-group figure-actions">
+                <html:span class="figure-icon-wrap">
+                  <html:button
+                    id="zotero2eagle-note-select-all"
+                    class="figure-button figure-icon-button"
+                    type="button"
+                    aria-label="全选当前可见图标"
+                    aria-pressed="false"
+                  >
+                    <html:img
+                      src="chrome://__addonRef__/content/icons/select-visible.svg"
+                      alt=""
+                    />
+                  </html:button>
+                  <html:span
+                    id="zotero2eagle-note-select-all-tooltip"
+                    class="figure-icon-tooltip"
+                    role="tooltip"
+                  ></html:span>
+                </html:span>
+                <html:button
+                  id="zotero2eagle-note-save"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-save-eagle"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-note-move-trash"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-move-trash"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-note-restore"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-restore"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-note-delete-forever"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-delete-forever"
+                ></html:button>
+                <html:button
+                  id="zotero2eagle-note-empty-trash"
+                  class="figure-button figure-button-compact"
+                  type="button"
+                  data-l10n-id="overview-empty-trash"
+                ></html:button>
+              </html:div>
+            </html:div>
+            <html:span
+              id="zotero2eagle-note-selected-count"
+              class="figure-count figure-toolbar-selected-count"
+            ></html:span>
           </html:div>
-          <html:span
-            id="zotero2eagle-note-selected-count"
-            class="figure-count"
-          ></html:span>
-          <html:span
-            id="zotero2eagle-note-count"
-            class="figure-count"
-          ></html:span>
+          <html:div class="figure-toolbar-row figure-toolbar-secondary">
+            <html:label class="figure-size-control">
+              <html:span
+                class="figure-filter-label"
+                data-l10n-id="overview-size"
+              ></html:span>
+              <html:input
+                id="zotero2eagle-note-size"
+                type="range"
+                min="140"
+                max="420"
+                step="20"
+              />
+            </html:label>
+            <html:span
+              id="zotero2eagle-note-count"
+              class="figure-count figure-toolbar-image-count"
+            ></html:span>
+          </html:div>
         </html:div>
         <html:div
           id="zotero2eagle-note-status"

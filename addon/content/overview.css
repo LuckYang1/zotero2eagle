@@ -53,7 +53,8 @@ window {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -119,6 +120,66 @@ input {
   border-radius: 7px;
   background: var(--figure-button-bg);
   color: var(--figure-text);
+}
+.figure-toolbar-group.figure-sort-controls {
+  position: relative;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.figure-sort-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+}
+.figure-sort-button img {
+  display: block;
+  width: 21px;
+  height: 21px;
+  pointer-events: none;
+}
+@media (prefers-color-scheme: dark) {
+  .figure-sort-button img {
+    filter: invert(1);
+  }
+}
+.figure-sort-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 5px);
+  left: 0;
+  min-width: 112px;
+  padding: 4px;
+  border: 1px solid var(--figure-border-strong);
+  border-radius: 7px;
+  background: var(--figure-panel);
+  box-shadow: 0 8px 24px rgb(24 34 50 / 18%);
+}
+.figure-sort-menu[hidden] {
+  display: none;
+}
+.figure-sort-menu button {
+  display: block;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--figure-text);
+  text-align: left;
+  cursor: pointer;
+}
+.figure-sort-menu button:hover,
+.figure-sort-menu button[aria-checked="true"] {
+  background: var(--figure-accent-soft);
+  color: var(--figure-accent);
+}
+.figure-sort-button:focus-visible,
+.figure-sort-menu button:focus-visible {
+  outline: 2px solid var(--figure-accent);
+  outline-offset: 2px;
 }
 .figure-dropdown {
   position: relative;

@@ -63,6 +63,8 @@ class OverviewController {
   private view: "library" | "trash" = "library";
   private busy = false;
   private searchQuery = "";
+  private sortField = getPref("defaultSortField") || "dateModified";
+  private sortOrder = getPref("defaultSortOrder") || "desc";
   private previewClickTimer: number | null = null;
 
   constructor(private readonly win: Window) {}
@@ -111,9 +113,15 @@ class OverviewController {
       "click",
       () => void this.deletePermanently(this.getViewRecords()),
     );
-    this.win.document.addEventListener("click", () => this.hideContextMenu());
+    this.win.document.addEventListener("click", () => {
+      this.hideContextMenu();
+      this.hideSortMenu();
+    });
     this.win.document.addEventListener("keydown", (event) => {
-      if ((event as KeyboardEvent).key === "Escape") this.hideContextMenu();
+      if ((event as KeyboardEvent).key === "Escape") {
+        this.hideContextMenu();
+        this.hideSortMenu();
+      }
     });
     this.getRefreshButton().addEventListener("click", () => {
       void this.reload({ forceRefresh: true });
@@ -122,6 +130,45 @@ class OverviewController {
       "zotero2eagle-image-manager-search",
     ).addEventListener("input", (event) => {
       this.searchQuery = (event.target as HTMLInputElement).value;
+      this.render();
+    });
+    const sortFieldButton = this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-sort-field",
+    );
+    const sortMenu = this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-sort-menu",
+    );
+    const sortLabel = getString("overview-sort-field");
+    sortFieldButton.title = sortLabel;
+    sortFieldButton.setAttribute("aria-label", sortLabel);
+    this.updateSortFieldMenu();
+    sortFieldButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      sortMenu.hidden = !sortMenu.hidden;
+      sortFieldButton.setAttribute("aria-expanded", String(!sortMenu.hidden));
+      if (!sortMenu.hidden) {
+        sortMenu.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
+      }
+    });
+    for (const option of sortMenu.querySelectorAll<HTMLButtonElement>(
+      "[data-sort-field]",
+    )) {
+      option.addEventListener("click", (event: Event) => {
+        event.stopPropagation();
+        this.sortField = option.dataset.sortField || "dateModified";
+        this.updateSortFieldMenu();
+        this.hideSortMenu();
+        sortFieldButton.focus();
+        this.render();
+      });
+    }
+    const sortOrderButton = this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-sort-order",
+    );
+    this.updateSortOrderButton();
+    sortOrderButton.addEventListener("click", () => {
+      this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
+      this.updateSortOrderButton();
       this.render();
     });
     this.getSizeInput().addEventListener("input", () => {
@@ -254,12 +301,9 @@ class OverviewController {
       }
     }
 
-    const sortField = getPref("defaultSortField") || "dateModified";
-    const sortOrder = getPref("defaultSortOrder") || "desc";
-    
     records.sort((a, b) => {
-      let cmp = 0;
-      switch (sortField) {
+      let cmp: number;
+      switch (this.sortField) {
         case "dateAdded":
           cmp = (a.dateAdded || "").localeCompare(b.dateAdded || "");
           break;
@@ -277,10 +321,48 @@ class OverviewController {
       if (cmp === 0) {
         cmp = a.key.localeCompare(b.key);
       }
-      return sortOrder === "asc" ? cmp : -cmp;
+      return this.sortOrder === "asc" ? cmp : -cmp;
     });
 
     return records;
+  }
+
+  private updateSortOrderButton() {
+    const button = this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-sort-order",
+    );
+    const order = this.sortOrder === "asc" ? "asc" : "desc";
+    const label = getString(`overview-sort-${order}`);
+    const icon = button.querySelector<HTMLImageElement>("img");
+    if (icon) {
+      icon.src = `chrome://${config.addonRef}/content/icons/arrow-${order === "asc" ? "up" : "down"}.svg`;
+    }
+    button.dataset.order = order;
+    button.title = label;
+    button.setAttribute("aria-label", label);
+  }
+
+  private updateSortFieldMenu() {
+    const menu = this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-sort-menu",
+    );
+    for (const option of menu.querySelectorAll<HTMLButtonElement>(
+      "[data-sort-field]",
+    )) {
+      option.setAttribute(
+        "aria-checked",
+        String(option.dataset.sortField === this.sortField),
+      );
+    }
+  }
+
+  private hideSortMenu() {
+    this.getElement<HTMLElement>(
+      "zotero2eagle-image-manager-sort-menu",
+    ).hidden = true;
+    this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-sort-field",
+    ).setAttribute("aria-expanded", "false");
   }
 
   private getSelectedRecords() {

@@ -13,7 +13,7 @@
     <html:link
       id="zotero2eagle-overview-stylesheet"
       rel="stylesheet"
-      href="chrome://__addonRef__/content/overview.css?revision=refresh-icon-2"
+      href="chrome://__addonRef__/content/overview.css?revision=sort-icons-3"
     />
   </linkset>
 
@@ -124,6 +124,65 @@
             data-l10n-id="overview-search-pdf"
             data-l10n-attrs="placeholder"
           />
+          <html:div class="figure-toolbar-group figure-sort-controls">
+            <html:button
+              id="zotero2eagle-image-manager-sort-field"
+              class="figure-button figure-sort-button"
+              type="button"
+              aria-label="排序方式"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              title="排序方式"
+            >
+              <html:img
+                src="chrome://__addonRef__/content/icons/filter.svg"
+                alt=""
+              />
+            </html:button>
+            <html:div
+              id="zotero2eagle-image-manager-sort-menu"
+              class="figure-sort-menu"
+              role="menu"
+              hidden="hidden"
+            >
+              <html:button
+                type="button"
+                role="menuitemradio"
+                data-sort-field="dateModified"
+                data-l10n-id="overview-sort-modified"
+              ></html:button>
+              <html:button
+                type="button"
+                role="menuitemradio"
+                data-sort-field="dateAdded"
+                data-l10n-id="overview-sort-added"
+              ></html:button>
+              <html:button
+                type="button"
+                role="menuitemradio"
+                data-sort-field="title"
+                data-l10n-id="overview-sort-title"
+              ></html:button>
+              <html:button
+                type="button"
+                role="menuitemradio"
+                data-sort-field="color"
+                data-l10n-id="overview-sort-color"
+              ></html:button>
+            </html:div>
+            <html:button
+              id="zotero2eagle-image-manager-sort-order"
+              class="figure-button figure-sort-button"
+              type="button"
+              aria-label="降序"
+              title="降序"
+            >
+              <html:img
+                src="chrome://__addonRef__/content/icons/arrow-down.svg"
+                alt=""
+              />
+            </html:button>
+          </html:div>
           <html:div class="figure-toolbar-group figure-actions">
             <html:button
               id="zotero2eagle-image-manager-select-all"

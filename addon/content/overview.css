@@ -659,24 +659,6 @@ input {
   object-fit: contain;
 }
 
-.figure-hover-preview {
-  position: fixed;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid var(--figure-border-strong);
-  border-radius: 8px;
-  background: var(--figure-panel);
-  box-shadow: 0 12px 32px rgb(24 34 50 / 24%);
-}
-
-.figure-hover-preview img {
-  display: block;
-  object-fit: contain;
-}
-
 .figure-missing {
   padding: 12px;
   color: var(--figure-muted);

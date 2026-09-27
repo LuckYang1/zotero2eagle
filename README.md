@@ -82,7 +82,7 @@ npm test
 
 ## Release
 
-Current version: `v0.1.14`
+Current version: `v0.1.15`
 
 - Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 

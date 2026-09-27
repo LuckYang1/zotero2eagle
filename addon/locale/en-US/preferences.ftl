@@ -31,3 +31,10 @@ pref-exclude-folders-input =
   .placeholder = Enter folder paths to exclude, one per line
 pref-confirm-delete = Delete confirmation
 pref-confirm-delete-help = Show confirmation dialog before deleting files
+
+pref-about-title = About
+pref-about-version = Plugin Version
+pref-about-links = Links
+pref-about-github = GitHub Homepage
+pref-about-bug = Submit Bug
+pref-about-feature = Feature Request

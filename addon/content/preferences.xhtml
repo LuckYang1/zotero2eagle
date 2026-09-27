@@ -56,13 +56,6 @@
   </hbox>
 </vbox>
 
-<vbox>
-  <html:label
-    data-l10n-id="pref-help"
-    data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'
-  ></html:label>
-</vbox>
-
 <vbox class="z2e-settings-group">
   <hbox class="z2e-section">
     <html:label class="z2e-title" data-l10n-id="pref-imgmgr-title"></html:label>
@@ -141,6 +134,28 @@
   </hbox>
 </vbox>
 
+<vbox class="z2e-settings-group">
+  <hbox class="z2e-section">
+    <html:label class="z2e-title" data-l10n-id="pref-about-title"></html:label>
+  </hbox>
+
+  <hbox style="padding: 0 24px 12px 24px;">
+    <html:div class="z2e-about-links" style="font-size: 13px;">
+      <html:a href="https://github.com/LuckYang1/zotero2eagle" target="_blank" data-l10n-id="pref-about-github"></html:a>
+      <html:span class="z2e-link-separator">|</html:span>
+      <html:a href="https://github.com/LuckYang1/zotero2eagle/issues/new?labels=bug" target="_blank" data-l10n-id="pref-about-bug"></html:a>
+      <html:span class="z2e-link-separator">|</html:span>
+      <html:a href="https://github.com/LuckYang1/zotero2eagle/issues/new?labels=enhancement" target="_blank" data-l10n-id="pref-about-feature"></html:a>
+    </html:div>
+  </hbox>
+
+  <html:div class="modern-divider"></html:div>
+
+  <hbox style="padding: 12px 24px 16px 24px;">
+    <html:div class="modern-desc" data-l10n-id="pref-help" data-l10n-args='{"time": "__buildTime__","name": "__addonName__","version":"__buildVersion__"}'></html:div>
+  </hbox>
+</vbox>
+
 <html:style><![CDATA[
   .z2e-settings-group {
     background: color-mix(in srgb, currentColor 3%, transparent);
@@ -185,6 +200,25 @@
     opacity: 0.65;
     margin: 0;
     line-height: 1.4;
+  }
+
+  
+  .z2e-about-links html|a {
+    color: color-mix(in srgb, currentColor 20%, #0066cc);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) {
+    .z2e-about-links html|a {
+      color: #66b3ff;
+    }
+  }
+  .z2e-about-links html|a:hover {
+    text-decoration: underline;
+  }
+  .z2e-link-separator {
+    margin: 0 8px;
+    opacity: 0.5;
   }
 
   .z2e-section {

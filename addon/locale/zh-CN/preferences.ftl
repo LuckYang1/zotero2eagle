@@ -31,3 +31,10 @@ pref-exclude-folders-input =
   .placeholder = 输入要排除的文件夹路径, 每行一个
 pref-confirm-delete = 删除确认
 pref-confirm-delete-help = 删除文件前显示确认对话框
+
+pref-about-title = 关于
+pref-about-version = 插件版本
+pref-about-links = 更多支持
+pref-about-github = GitHub 主页
+pref-about-bug = Bug 提交
+pref-about-feature = 功能建议

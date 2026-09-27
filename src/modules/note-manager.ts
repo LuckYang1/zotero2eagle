@@ -423,6 +423,8 @@ export class NoteManager {
       }
       const badge = this.create("span");
       badge.className = "figure-ref-badge";
+      badge.style.backgroundColor = "#49b357";
+      badge.style.color = "#fff";
       const count = this.references?.get(identity)?.length ?? 0;
       badge.textContent = !this.references
         ? getString("note-unchecked")

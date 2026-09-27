@@ -1,6 +1,5 @@
 pref-title = Eagle 集成
-pref-auto-import =
-    .label = 自动将新的图片标注导入 Eagle
+pref-auto-import = 自动导入
 pref-auto-import-help = 关闭后不会自动导入，但仍可通过条目右键菜单或工具菜单手动导出。
 pref-api-url = Eagle API 地址
 pref-api-url-help = Eagle 桌面端默认 API 地址为 http://localhost:41595。

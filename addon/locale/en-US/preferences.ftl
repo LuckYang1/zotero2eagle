@@ -1,6 +1,5 @@
 pref-title = Eagle Integration
-pref-auto-import =
-    .label = Automatically import new image annotations into Eagle
+pref-auto-import = Auto import
 pref-auto-import-help = When disabled, annotations can still be exported manually from the item context menu or Tools menu.
 pref-api-url = Eagle API URL
 pref-api-url-help = Default Eagle desktop API endpoint is http://localhost:41595.

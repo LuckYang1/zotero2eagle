@@ -2,84 +2,59 @@
   <html:link rel="localization" href="__addonRef__-preferences.ftl" />
 </linkset>
 
-<groupbox
+<vbox
+  class="z2e-settings-group"
   onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })"
 >
   <hbox class="z2e-section">
     <html:label class="z2e-title" data-l10n-id="pref-title"></html:label>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:input
-      type="checkbox"
-      id="zotero-prefpane-__addonRef__-auto-import"
-      preference="enableAutoImport"
-    ></html:input>
-    <html:label
-      for="zotero-prefpane-__addonRef__-auto-import"
-      data-l10n-id="pref-auto-import"
-    ></html:label>
-  </hbox>
-  <hbox class="z2e-row-tight">
-    <html:div class="z2e-help" data-l10n-id="pref-auto-import-help"></html:div>
-  </hbox>
-
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-api-url"
-      data-l10n-id="pref-api-url"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:input
-        type="text"
-        id="zotero-prefpane-__addonRef__-api-url"
-        preference="eagleApiUrl"
-      ></html:input>
-      <html:div class="z2e-help" data-l10n-id="pref-api-url-help"></html:div>
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-auto-import" data-l10n-id="pref-auto-import"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-auto-import-help"></html:div>
     </vbox>
+    <html:input type="checkbox" id="zotero-prefpane-__addonRef__-auto-import" preference="enableAutoImport"></html:input>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-api-token"
-      data-l10n-id="pref-api-token"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:input
-        type="password"
-        id="zotero-prefpane-__addonRef__-api-token"
-        preference="eagleApiToken"
-      ></html:input>
-      <html:div class="z2e-help" data-l10n-id="pref-api-token-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-api-url" data-l10n-id="pref-api-url"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-api-url-help"></html:div>
     </vbox>
+    <html:input type="text" id="zotero-prefpane-__addonRef__-api-url" preference="eagleApiUrl"></html:input>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-eagle-folder"
-      data-l10n-id="pref-eagle-folder"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:input
-        type="text"
-        id="zotero-prefpane-__addonRef__-eagle-folder"
-        preference="eagleFolderId"
-      ></html:input>
-      <html:div class="z2e-help" data-l10n-id="pref-eagle-folder-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-api-token" data-l10n-id="pref-api-token"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-api-token-help"></html:div>
     </vbox>
+    <html:input type="password" id="zotero-prefpane-__addonRef__-api-token" preference="eagleApiToken"></html:input>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:button
-      id="__addonRef__-test-connection"
-      data-l10n-id="pref-test-connection"
-    ></html:button>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-eagle-folder" data-l10n-id="pref-eagle-folder"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-eagle-folder-help"></html:div>
+    </vbox>
+    <html:input type="text" id="zotero-prefpane-__addonRef__-eagle-folder" preference="eagleFolderId"></html:input>
+  </hbox>
+
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row" style="justify-content: flex-start; gap: 12px; margin-top: 4px;">
+    <html:button id="__addonRef__-test-connection" data-l10n-id="pref-test-connection"></html:button>
     <html:span id="__addonRef__-connection-status"></html:span>
   </hbox>
-</groupbox>
+</vbox>
 
 <vbox>
   <html:label
@@ -88,108 +63,130 @@
   ></html:label>
 </vbox>
 
-<groupbox>
+<vbox class="z2e-settings-group">
   <hbox class="z2e-section">
     <html:label class="z2e-title" data-l10n-id="pref-imgmgr-title"></html:label>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:input
-      type="checkbox"
-      id="zotero-prefpane-__addonRef__-show-file-size"
-      preference="showFileSize"
-    ></html:input>
-    <vbox>
-      <html:label
-        for="zotero-prefpane-__addonRef__-show-file-size"
-        data-l10n-id="pref-show-file-size"
-      ></html:label>
-      <html:div class="z2e-help" data-l10n-id="pref-show-file-size-help"></html:div>
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-show-file-size" data-l10n-id="pref-show-file-size"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-show-file-size-help"></html:div>
     </vbox>
+    <html:input type="checkbox" id="zotero-prefpane-__addonRef__-show-file-size" preference="showFileSize"></html:input>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:input
-      type="checkbox"
-      id="zotero-prefpane-__addonRef__-show-modified-time"
-      preference="showModifiedTime"
-    ></html:input>
-    <vbox>
-      <html:label
-        for="zotero-prefpane-__addonRef__-show-modified-time"
-        data-l10n-id="pref-show-modified-time"
-      ></html:label>
-      <html:div class="z2e-help" data-l10n-id="pref-show-modified-time-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-show-modified-time" data-l10n-id="pref-show-modified-time"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-show-modified-time-help"></html:div>
     </vbox>
+    <html:input type="checkbox" id="zotero-prefpane-__addonRef__-show-modified-time" preference="showModifiedTime"></html:input>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-sort-field"
-      data-l10n-id="pref-sort-field"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:select id="zotero-prefpane-__addonRef__-sort-field" preference="defaultSortField">
-        <html:option value="dateModified" data-l10n-id="pref-sort-field-modified"></html:option>
-        <html:option value="dateAdded" data-l10n-id="pref-sort-field-added"></html:option>
-        <html:option value="title" data-l10n-id="pref-sort-field-title"></html:option>
-        <html:option value="color" data-l10n-id="pref-sort-field-color"></html:option>
-      </html:select>
-      <html:div class="z2e-help" data-l10n-id="pref-sort-field-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-sort-field" data-l10n-id="pref-sort-field"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-sort-field-help"></html:div>
     </vbox>
+    <html:select id="zotero-prefpane-__addonRef__-sort-field" preference="defaultSortField">
+      <html:option value="dateModified" data-l10n-id="pref-sort-field-modified"></html:option>
+      <html:option value="dateAdded" data-l10n-id="pref-sort-field-added"></html:option>
+      <html:option value="title" data-l10n-id="pref-sort-field-title"></html:option>
+      <html:option value="color" data-l10n-id="pref-sort-field-color"></html:option>
+    </html:select>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-sort-order"
-      data-l10n-id="pref-sort-order"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:select id="zotero-prefpane-__addonRef__-sort-order" preference="defaultSortOrder">
-        <html:option value="desc" data-l10n-id="pref-sort-order-desc"></html:option>
-        <html:option value="asc" data-l10n-id="pref-sort-order-asc"></html:option>
-      </html:select>
-      <html:div class="z2e-help" data-l10n-id="pref-sort-order-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-sort-order" data-l10n-id="pref-sort-order"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-sort-order-help"></html:div>
     </vbox>
+    <html:select id="zotero-prefpane-__addonRef__-sort-order" preference="defaultSortOrder">
+      <html:option value="desc" data-l10n-id="pref-sort-order-desc"></html:option>
+      <html:option value="asc" data-l10n-id="pref-sort-order-asc"></html:option>
+    </html:select>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:label
-      class="z2e-label"
-      for="zotero-prefpane-__addonRef__-exclude-folders"
-      data-l10n-id="pref-exclude-folders"
-    ></html:label>
-    <vbox class="z2e-control">
-      <html:textarea
-        id="zotero-prefpane-__addonRef__-exclude-folders"
-        preference="excludeFolders"
-        rows="5"
-        data-l10n-id="pref-exclude-folders-input"
-        data-l10n-attrs="placeholder"
-      ></html:textarea>
-      <html:div class="z2e-help" data-l10n-id="pref-exclude-folders-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row modern-align-top">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-exclude-folders" data-l10n-id="pref-exclude-folders"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-exclude-folders-help"></html:div>
     </vbox>
+    <html:textarea
+      id="zotero-prefpane-__addonRef__-exclude-folders"
+      preference="excludeFolders"
+      rows="4"
+      data-l10n-id="pref-exclude-folders-input"
+      data-l10n-attrs="placeholder"
+    ></html:textarea>
   </hbox>
 
-  <hbox class="z2e-row">
-    <html:input
-      type="checkbox"
-      id="zotero-prefpane-__addonRef__-confirm-delete"
-      preference="confirmDelete"
-    ></html:input>
-    <vbox>
-      <html:label
-        for="zotero-prefpane-__addonRef__-confirm-delete"
-        data-l10n-id="pref-confirm-delete"
-      ></html:label>
-      <html:div class="z2e-help" data-l10n-id="pref-confirm-delete-help"></html:div>
+  <html:div class="modern-divider"></html:div>
+
+  <hbox class="modern-row">
+    <vbox class="modern-info">
+      <html:label class="modern-name" for="zotero-prefpane-__addonRef__-confirm-delete" data-l10n-id="pref-confirm-delete"></html:label>
+      <html:div class="modern-desc" data-l10n-id="pref-confirm-delete-help"></html:div>
     </vbox>
+    <html:input type="checkbox" id="zotero-prefpane-__addonRef__-confirm-delete" preference="confirmDelete"></html:input>
   </hbox>
-</groupbox>
+</vbox>
 
 <html:style><![CDATA[
+  .z2e-settings-group {
+    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-radius: 10px;
+    padding: 8px 24px;
+    margin: 16px 0 0 0;
+  }
+
+  .modern-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+  }
+
+  .modern-align-top {
+    align-items: flex-start;
+  }
+
+  .modern-divider {
+    height: 1px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    margin: 0;
+  }
+
+  .modern-info {
+    flex: 1;
+    margin-right: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .modern-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 6px 0;
+  }
+
+  .modern-desc {
+    font-size: 13px;
+    opacity: 0.65;
+    margin: 0;
+    line-height: 1.4;
+  }
+
   .z2e-section {
     margin-bottom: 12px;
   }
@@ -225,7 +222,7 @@
 
   html|input[type="text"],
   html|input[type="password"] {
-    width: 420px;
+    width: 320px;
     box-sizing: border-box;
     padding: 6px 8px;
   }
@@ -237,7 +234,7 @@
   }
 
   html|textarea {
-    width: 420px;
+    width: 320px;
     box-sizing: border-box;
     padding: 6px 8px;
     resize: vertical;

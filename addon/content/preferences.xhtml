@@ -88,6 +88,107 @@
   ></html:label>
 </vbox>
 
+<groupbox>
+  <hbox class="z2e-section">
+    <html:label class="z2e-title" data-l10n-id="pref-imgmgr-title"></html:label>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:input
+      type="checkbox"
+      id="zotero-prefpane-__addonRef__-show-file-size"
+      preference="showFileSize"
+    ></html:input>
+    <vbox>
+      <html:label
+        for="zotero-prefpane-__addonRef__-show-file-size"
+        data-l10n-id="pref-show-file-size"
+      ></html:label>
+      <html:div class="z2e-help" data-l10n-id="pref-show-file-size-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:input
+      type="checkbox"
+      id="zotero-prefpane-__addonRef__-show-modified-time"
+      preference="showModifiedTime"
+    ></html:input>
+    <vbox>
+      <html:label
+        for="zotero-prefpane-__addonRef__-show-modified-time"
+        data-l10n-id="pref-show-modified-time"
+      ></html:label>
+      <html:div class="z2e-help" data-l10n-id="pref-show-modified-time-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-sort-field"
+      data-l10n-id="pref-sort-field"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:select id="zotero-prefpane-__addonRef__-sort-field" preference="defaultSortField">
+        <html:option value="dateModified" data-l10n-id="pref-sort-field-modified"></html:option>
+        <html:option value="dateAdded" data-l10n-id="pref-sort-field-added"></html:option>
+        <html:option value="title" data-l10n-id="pref-sort-field-title"></html:option>
+        <html:option value="color" data-l10n-id="pref-sort-field-color"></html:option>
+      </html:select>
+      <html:div class="z2e-help" data-l10n-id="pref-sort-field-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-sort-order"
+      data-l10n-id="pref-sort-order"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:select id="zotero-prefpane-__addonRef__-sort-order" preference="defaultSortOrder">
+        <html:option value="desc" data-l10n-id="pref-sort-order-desc"></html:option>
+        <html:option value="asc" data-l10n-id="pref-sort-order-asc"></html:option>
+      </html:select>
+      <html:div class="z2e-help" data-l10n-id="pref-sort-order-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:label
+      class="z2e-label"
+      for="zotero-prefpane-__addonRef__-exclude-folders"
+      data-l10n-id="pref-exclude-folders"
+    ></html:label>
+    <vbox class="z2e-control">
+      <html:textarea
+        id="zotero-prefpane-__addonRef__-exclude-folders"
+        preference="excludeFolders"
+        rows="5"
+        data-l10n-id="pref-exclude-folders-input"
+        data-l10n-attrs="placeholder"
+      ></html:textarea>
+      <html:div class="z2e-help" data-l10n-id="pref-exclude-folders-help"></html:div>
+    </vbox>
+  </hbox>
+
+  <hbox class="z2e-row">
+    <html:input
+      type="checkbox"
+      id="zotero-prefpane-__addonRef__-confirm-delete"
+      preference="confirmDelete"
+    ></html:input>
+    <vbox>
+      <html:label
+        for="zotero-prefpane-__addonRef__-confirm-delete"
+        data-l10n-id="pref-confirm-delete"
+      ></html:label>
+      <html:div class="z2e-help" data-l10n-id="pref-confirm-delete-help"></html:div>
+    </vbox>
+  </hbox>
+</groupbox>
+
 <html:style><![CDATA[
   .z2e-section {
     margin-bottom: 12px;
@@ -127,6 +228,20 @@
     width: 420px;
     box-sizing: border-box;
     padding: 6px 8px;
+  }
+
+  html|select {
+    min-width: 160px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+  }
+
+  html|textarea {
+    width: 420px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    resize: vertical;
+    font: inherit;
   }
 
   html|button[id*="__addonRef__"] {

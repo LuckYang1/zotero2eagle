@@ -18,6 +18,8 @@ export interface FigureAnnotationRecord {
   position: FigureAnnotationPosition | null;
   imageHeightRatio: number | null;
   imageURI: string | null;
+  imagePath: string | null;
+  filePath: string | null;
 }
 
 export const IMAGE_ANNOTATION_TYPE_ID = 3;
@@ -55,6 +57,7 @@ export interface RuntimeAttachmentItem {
   topLevelItem?: RuntimeTopLevelItem;
   getDisplayTitle?: () => string;
   attachmentFilename?: string;
+  getFilePath?: () => string | false;
 }
 
 export interface RuntimeAnnotationItem {
@@ -86,6 +89,7 @@ export function isFigureAnnotationItem(item: RuntimeAnnotationItem) {
 export function createFigureAnnotationRecord(
   annotation: RuntimeAnnotationItem,
   imageURI: string | null,
+  imagePath: string | null,
 ): FigureAnnotationRecord {
   const attachment = annotation.parentItem;
   const topLevelItem = attachment?.topLevelItem ?? annotation.topLevelItem;
@@ -115,6 +119,8 @@ export function createFigureAnnotationRecord(
     position,
     imageHeightRatio: getImageHeightRatio(position),
     imageURI,
+    imagePath,
+    filePath: attachment?.getFilePath?.() || null,
   };
 }
 
@@ -244,6 +250,7 @@ async function loadFigureAnnotations() {
       createFigureAnnotationRecord(
         runtimeAnnotation,
         getAnnotationImageURI(annotation),
+        getAnnotationImagePath(annotation),
       ),
     );
   }
@@ -297,14 +304,18 @@ function isReadableAttachment(item: Zotero.Item) {
   );
 }
 
-function getAnnotationImageURI(annotation: Zotero.Item) {
+function getAnnotationImagePath(annotation: Zotero.Item) {
   try {
-    const path = Zotero.Annotations.getCacheImagePath(annotation);
-    return path ? Zotero.File.pathToFileURI(path) : null;
+    return Zotero.Annotations.getCacheImagePath(annotation) || null;
   } catch (error) {
     Zotero.logError(error instanceof Error ? error : new Error(String(error)));
     return null;
   }
+}
+
+function getAnnotationImageURI(annotation: Zotero.Item) {
+  const path = getAnnotationImagePath(annotation);
+  return path ? Zotero.File.pathToFileURI(path) : null;
 }
 
 function parseAnnotationPosition(

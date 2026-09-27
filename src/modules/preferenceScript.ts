@@ -38,6 +38,36 @@ async function updatePrefsUI() {
   getInputElement(prefId("api-token"))!.value = getPref("eagleApiToken") || "";
   getInputElement(prefId("eagle-folder"))!.value =
     getPref("eagleFolderId") || "";
+
+  // Image manager settings
+  getInputElement(prefId("show-file-size"))!.checked =
+    !!getPref("showFileSize");
+  getInputElement(prefId("show-modified-time"))!.checked =
+    !!getPref("showModifiedTime");
+
+  const sortFieldSelect = getDocument()?.getElementById(
+    prefId("sort-field"),
+  ) as HTMLSelectElement | null;
+  if (sortFieldSelect) {
+    sortFieldSelect.value = getPref("defaultSortField") || "dateModified";
+  }
+
+  const sortOrderSelect = getDocument()?.getElementById(
+    prefId("sort-order"),
+  ) as HTMLSelectElement | null;
+  if (sortOrderSelect) {
+    sortOrderSelect.value = getPref("defaultSortOrder") || "desc";
+  }
+
+  const excludeTextarea = getDocument()?.getElementById(
+    prefId("exclude-folders"),
+  ) as HTMLTextAreaElement | null;
+  if (excludeTextarea) {
+    excludeTextarea.value = getPref("excludeFolders") || "";
+  }
+
+  getInputElement(prefId("confirm-delete"))!.checked =
+    !!getPref("confirmDelete");
 }
 
 function bindPrefEvents() {
@@ -105,6 +135,55 @@ function bindPrefEvents() {
         button.disabled = false;
       }
     });
+
+  // Image manager settings
+  getInputElement(prefId("show-file-size"))?.addEventListener(
+    "change",
+    (event: Event) => {
+      setPref("showFileSize", (event.target as HTMLInputElement).checked);
+    },
+  );
+
+  getInputElement(prefId("show-modified-time"))?.addEventListener(
+    "change",
+    (event: Event) => {
+      setPref("showModifiedTime", (event.target as HTMLInputElement).checked);
+    },
+  );
+
+  getDocument()
+    ?.getElementById(prefId("sort-field"))
+    ?.addEventListener("change", (event: Event) => {
+      setPref(
+        "defaultSortField",
+        (event.target as HTMLSelectElement).value,
+      );
+    });
+
+  getDocument()
+    ?.getElementById(prefId("sort-order"))
+    ?.addEventListener("change", (event: Event) => {
+      setPref(
+        "defaultSortOrder",
+        (event.target as HTMLSelectElement).value,
+      );
+    });
+
+  getDocument()
+    ?.getElementById(prefId("exclude-folders"))
+    ?.addEventListener("input", (event: Event) => {
+      setPref(
+        "excludeFolders",
+        (event.target as HTMLTextAreaElement).value,
+      );
+    });
+
+  getInputElement(prefId("confirm-delete"))?.addEventListener(
+    "change",
+    (event: Event) => {
+      setPref("confirmDelete", (event.target as HTMLInputElement).checked);
+    },
+  );
 }
 
 export async function registerPrefsScripts(window: Window) {

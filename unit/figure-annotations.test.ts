@@ -69,6 +69,7 @@ test("record includes annotation, parent attachment, collections, and image URI"
   const record = createFigureAnnotationRecord(
     annotation(),
     "file:///tmp/cache/ANN.png",
+    "/tmp/cache/ANN.png",
   );
 
   assert.deepEqual(record, {
@@ -91,12 +92,15 @@ test("record includes annotation, parent attachment, collections, and image URI"
     position: { pageIndex: 6, rects: [[12, 34, 56, 78]] },
     imageHeightRatio: 1,
     imageURI: "file:///tmp/cache/ANN.png",
+    imagePath: "/tmp/cache/ANN.png",
+    filePath: null,
   });
 });
 
 test("invalid annotation position is ignored", () => {
   const record = createFigureAnnotationRecord(
     annotation({ annotationPosition: "not-json" }),
+    null,
     null,
   );
 

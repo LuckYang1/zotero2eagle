@@ -8,14 +8,9 @@ import {
   type NoteImageRecord,
   type NoteReference,
 } from "./note-images";
-import {
-  readNoteTrashEntries,
-  reconcileTrashEntries,
-  recordIdentity,
-  writeNoteTrashEntries,
-  type TrashEntry,
-} from "./image-manager-trash";
+import { readNoteTrashEntries, reconcileTrashEntries, recordIdentity, writeNoteTrashEntries, type TrashEntry } from "./image-manager-trash";
 import { showImagePreview } from "./image-preview";
+import { getPref } from "../utils/prefs";
 
 const NS = "http://www.w3.org/1999/xhtml";
 type ReferenceFilter = "all" | "referenced" | "unreferenced";
@@ -352,12 +347,48 @@ export class NoteManager {
             ),
           ])
         : new Set([this.collection]);
-    return filterNoteImages(this.viewRecords(), {
+    
+    let filtered = filterNoteImages(this.viewRecords(), {
       query: this.query,
       collectionKeys,
       referenceFilter: this.referenceFilter,
       references: this.references,
     });
+
+    const excludeStr = getPref("excludeFolders") as string | undefined;
+    if (excludeStr) {
+      const excludes = excludeStr.split('\n').map(s => s.trim()).filter(Boolean);
+      if (excludes.length > 0) {
+        filtered = filtered.filter(record => {
+          if (!record.filePath) return true;
+          return !excludes.some(ex => record.filePath!.includes(ex));
+        });
+      }
+    }
+
+    const sortField = getPref("defaultSortField") || "dateModified";
+    const sortOrder = getPref("defaultSortOrder") || "desc";
+
+    filtered.sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case "title":
+          cmp = (a.noteTitle || "").localeCompare(b.noteTitle || "");
+          break;
+        case "dateAdded":
+        case "color":
+        case "dateModified":
+        default:
+          cmp = 0; // Note manager doesn't track dates/colors, fallback to stable
+          break;
+      }
+      if (cmp === 0) {
+        cmp = a.key.localeCompare(b.key);
+      }
+      return sortOrder === "asc" ? cmp : -cmp;
+    });
+
+    return filtered;
   }
 
   private selectedRecords() {
@@ -440,6 +471,62 @@ export class NoteManager {
       const meta = this.create("div");
       meta.className = "figure-note-meta";
       meta.textContent = record.noteTitle;
+
+      const showSize = getPref("showFileSize");
+      const showTime = getPref("showModifiedTime");
+      let fileInfoRow: HTMLElement | null = null;
+
+      if (showSize || showTime) {
+        fileInfoRow = this.create("div");
+        fileInfoRow.className = "figure-file-info";
+        fileInfoRow.style.width = "100%";
+        fileInfoRow.style.display = "flex";
+        fileInfoRow.style.justifyContent = "space-between";
+        fileInfoRow.style.fontSize = "11px";
+        fileInfoRow.style.color = "var(--figure-secondary)";
+        fileInfoRow.style.marginTop = "2px";
+
+        const sizeSpan = this.create("span");
+        const timeSpan = this.create("span");
+
+        if (showSize) {
+          sizeSpan.className = "figure-size";
+          sizeSpan.textContent = "—";
+          fileInfoRow.append(sizeSpan);
+        }
+
+        if (showTime) {
+          timeSpan.className = "figure-time";
+          timeSpan.textContent = "—";
+          fileInfoRow.append(timeSpan);
+        }
+
+        if (record.filePath) {
+          try {
+            const file = Zotero.File.pathToFile(record.filePath);
+            if (file && file.exists() && file.isFile()) {
+              if (showSize) {
+                const bytes = file.fileSize;
+                if (bytes < 1024) sizeSpan.textContent = bytes + " B";
+                else if (bytes < 1024 * 1024) sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
+                else sizeSpan.textContent = (bytes / (1024 * 1024)).toFixed(1) + " MB";
+              }
+              if (showTime) {
+                const ms = file.lastModifiedTime;
+                const d = new Date(ms);
+                if (!isNaN(d.getTime())) {
+                  timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                }
+              }
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+
+      if (fileInfoRow) meta.append(fileInfoRow);
+
       const checkbox = this.create("input") as HTMLInputElement;
       checkbox.type = "checkbox";
       checkbox.className = "figure-select-checkbox";
@@ -453,6 +540,7 @@ export class NoteManager {
         card.classList.toggle("is-selected", checkbox.checked);
         this.updateActions();
       });
+
       card.append(imageArea, badge, title, meta, checkbox);
       grid.append(card);
     }
@@ -538,6 +626,7 @@ export class NoteManager {
   private async deletePermanently(records: NoteImageRecord[]) {
     if (this.busy || !records.length) return;
     if (
+      getPref("confirmDelete") &&
       !this.win.confirm(
         getString("note-delete-confirm", { args: { count: records.length } }),
       )

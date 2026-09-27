@@ -237,11 +237,50 @@ class OverviewController {
   }
 
   private getVisibleRecords() {
-    return this.getViewRecords().filter(
+    let records = this.getViewRecords().filter(
       (record) =>
         recordMatchesOverviewFilters(record, this.filters) &&
         matchesFigureFilenameSearch(record, this.searchQuery),
     );
+
+    const excludeStr = getPref("excludeFolders") as string | undefined;
+    if (excludeStr) {
+      const excludes = excludeStr.split('\n').map(s => s.trim()).filter(Boolean);
+      if (excludes.length > 0) {
+        records = records.filter(record => {
+          if (!record.filePath) return true;
+          return !excludes.some(ex => record.filePath!.includes(ex));
+        });
+      }
+    }
+
+    const sortField = getPref("defaultSortField") || "dateModified";
+    const sortOrder = getPref("defaultSortOrder") || "desc";
+    
+    records.sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case "dateAdded":
+          cmp = (a.dateAdded || "").localeCompare(b.dateAdded || "");
+          break;
+        case "title":
+          cmp = (a.topLevelTitle || "").localeCompare(b.topLevelTitle || "");
+          break;
+        case "color":
+          cmp = (a.color || "").localeCompare(b.color || "");
+          break;
+        case "dateModified":
+        default:
+          cmp = (a.dateModified || "").localeCompare(b.dateModified || "");
+          break;
+      }
+      if (cmp === 0) {
+        cmp = a.key.localeCompare(b.key);
+      }
+      return sortOrder === "asc" ? cmp : -cmp;
+    });
+
+    return records;
   }
 
   private getSelectedRecords() {
@@ -331,6 +370,7 @@ class OverviewController {
   private async deletePermanently(records: FigureAnnotationRecord[]) {
     if (this.busy || !records.length) return;
     if (
+      getPref("confirmDelete") &&
       !this.win.confirm(
         getString("overview-delete-confirm", {
           args: { count: records.length },
@@ -619,6 +659,54 @@ class OverviewController {
         comment.className = "figure-comment";
         comment.textContent = record.comment;
         meta.append(comment);
+      }
+
+      const showSize = getPref("showFileSize");
+      const showTime = getPref("showModifiedTime");
+
+      if (showSize || showTime) {
+        const infoRow = createHTMLElement(this.win, "div");
+        infoRow.className = "figure-file-info";
+        infoRow.style.gridColumn = "1 / -1";
+        infoRow.style.display = "flex";
+        infoRow.style.justifyContent = "space-between";
+        infoRow.style.fontSize = "11px";
+        infoRow.style.color = "var(--figure-secondary)";
+        infoRow.style.marginTop = "2px";
+
+        if (showSize) {
+          const sizeSpan = createHTMLElement(this.win, "span");
+          sizeSpan.className = "figure-size";
+          sizeSpan.textContent = "—";
+          if (record.imagePath) {
+            try {
+              const file = Zotero.File.pathToFile(record.imagePath);
+              if (file && file.exists() && file.isFile()) {
+                const bytes = file.fileSize;
+                if (bytes < 1024) sizeSpan.textContent = bytes + " B";
+                else if (bytes < 1024 * 1024) sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
+                else sizeSpan.textContent = (bytes / (1024 * 1024)).toFixed(1) + " MB";
+              }
+            } catch (e) {
+              // ignore
+            }
+          }
+          infoRow.append(sizeSpan);
+        }
+
+        if (showTime) {
+          const timeSpan = createHTMLElement(this.win, "span");
+          timeSpan.className = "figure-time";
+          if (record.dateModified) {
+            const d = new Date(record.dateModified.replace(" ", "T"));
+            if (!isNaN(d.getTime())) {
+              timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            }
+          }
+          infoRow.append(timeSpan);
+        }
+
+        meta.append(infoRow);
       }
 
       card.append(imageWrap, meta, checkbox);

@@ -19,6 +19,8 @@ import { showImagePreview } from "./image-preview";
 
 const NS = "http://www.w3.org/1999/xhtml";
 type ReferenceFilter = "all" | "referenced" | "unreferenced";
+type DropdownName = "collection" | "reference-filter";
+type DropdownOption = { value: string; label: string };
 
 export class NoteManager {
   private records: NoteImageRecord[] = [];
@@ -28,7 +30,9 @@ export class NoteManager {
   private view: "library" | "trash" = "library";
   private query = "";
   private collection = "all";
+  private collectionOptions: DropdownOption[] = [];
   private referenceFilter: ReferenceFilter = "all";
+  private referenceOptions: DropdownOption[] = [];
   private busy = false;
   private loadVersion = 0;
   private initialized = false;
@@ -40,16 +44,16 @@ export class NoteManager {
     if (this.initialized) return;
     this.initialized = true;
     this.input("search").placeholder = getString("overview-search-note");
-    for (const [value, label] of [
-      ["all", "note-filter-all"],
-      ["referenced", "note-filter-referenced"],
-      ["unreferenced", "note-filter-unreferenced"],
-    ] as const) {
-      const option = this.select("reference-filter").querySelector(
-        `option[value="${value}"]`,
-      );
-      if (option) option.textContent = getString(label);
-    }
+    this.referenceOptions = (
+      [
+        ["all", "note-filter-all"],
+        ["referenced", "note-filter-referenced"],
+        ["unreferenced", "note-filter-unreferenced"],
+      ] as const
+    ).map(([value, label]) => ({ value, label: getString(label) }));
+    this.initFilterDropdown("collection");
+    this.initFilterDropdown("reference-filter");
+    this.renderFilterDropdown("reference-filter");
     this.button("refresh").addEventListener("click", () => void this.reload());
     this.button("library").addEventListener("click", () =>
       this.switchView("library"),
@@ -84,17 +88,14 @@ export class NoteManager {
       this.query = this.input("search").value;
       this.render();
     });
-    this.select("collection").addEventListener("change", () => {
-      this.collection = this.select("collection").value;
-      this.render();
-    });
-    this.select("reference-filter").addEventListener("change", () => {
-      this.referenceFilter = this.select("reference-filter")
-        .value as ReferenceFilter;
-      this.render();
-      if (this.referenceFilter !== "all" && !this.references) void this.scan();
-    });
     this.win.document.addEventListener("click", () => this.hideMenu());
+    this.win.document.addEventListener("click", (event) => {
+      const target = event.target as Node;
+      for (const name of ["collection", "reference-filter"] as const) {
+        if (!this.element(`${name}-trigger`).parentElement?.contains(target))
+          this.closeFilterDropdown(name);
+      }
+    });
     this.win.document.addEventListener("keydown", (event) => {
       if ((event as KeyboardEvent).key === "Escape") this.hideMenu();
     });
@@ -106,6 +107,8 @@ export class NoteManager {
       this.win.clearTimeout(this.previewClickTimer);
     this.loadVersion += 1;
     this.hideMenu();
+    this.closeFilterDropdown("collection");
+    this.closeFilterDropdown("reference-filter");
     this.element("grid").replaceChildren();
   }
 
@@ -177,31 +180,150 @@ export class NoteManager {
   }
 
   private renderCollections() {
-    const select = this.select("collection");
-    select.replaceChildren();
-    const add = (value: string, label: string) => {
-      const option = this.create("option") as HTMLOptionElement;
-      option.value = value;
-      option.textContent = label;
-      select.append(option);
-    };
-    add("all", getString("note-filter-all"));
+    const options: DropdownOption[] = [
+      { value: "all", label: getString("note-filter-all") },
+    ];
     const ids = new Set(this.records.flatMap((record) => record.collectionIDs));
     for (const id of ids) {
       const collection = Zotero.Collections.get(id);
       if (!collection) continue;
       const library = Zotero.Libraries.get(collection.libraryID);
-      add(
-        `collection:${id}`,
-        `${library ? library.name : "Zotero"} / ${collection.name}`,
-      );
+      options.push({
+        value: `collection:${id}`,
+        label: `${library ? library.name : "Zotero"} / ${collection.name}`,
+      });
     }
     if (this.records.some((record) => !record.collectionIDs.length)) {
-      add("uncategorized", getString("overview-uncategorized"));
+      options.push({
+        value: "uncategorized",
+        label: getString("overview-uncategorized"),
+      });
     }
-    if (select.querySelector(`option[value="${this.collection}"]`))
-      select.value = this.collection;
-    else this.collection = select.value;
+    this.collectionOptions = options;
+    if (!options.some((option) => option.value === this.collection))
+      this.collection = "all";
+    this.renderFilterDropdown("collection");
+  }
+
+  private initFilterDropdown(name: DropdownName) {
+    const trigger = this.button(`${name}-trigger`);
+    const menu = this.element(`${name}-menu`);
+    trigger.addEventListener("click", () => {
+      if (!menu.hidden) {
+        this.closeFilterDropdown(name);
+        return;
+      }
+      for (const other of ["collection", "reference-filter"] as const)
+        this.closeFilterDropdown(other);
+      menu.hidden = false;
+      trigger.parentElement?.classList.add("is-open");
+      trigger.setAttribute("aria-expanded", "true");
+    });
+    trigger.addEventListener("keydown", (event) => {
+      const keyboardEvent = event as KeyboardEvent;
+      if (
+        keyboardEvent.key === "ArrowDown" ||
+        keyboardEvent.key === "ArrowUp"
+      ) {
+        event.preventDefault();
+        if (menu.hidden) trigger.click();
+        const options = this.dropdownOptions(name);
+        const selected = options.find(
+          (option) => option.getAttribute("aria-selected") === "true",
+        );
+        (
+          selected ??
+          options[keyboardEvent.key === "ArrowDown" ? 0 : options.length - 1]
+        )?.focus();
+      } else if (keyboardEvent.key === "Escape") {
+        this.closeFilterDropdown(name);
+      }
+    });
+    menu.addEventListener("keydown", (event) => {
+      const keyboardEvent = event as KeyboardEvent;
+      const options = this.dropdownOptions(name);
+      if (!options.length) return;
+      const current = options.indexOf(
+        this.win.document.activeElement as HTMLElement,
+      );
+      let next: number;
+      if (keyboardEvent.key === "ArrowDown")
+        next = (current + 1) % options.length;
+      else if (keyboardEvent.key === "ArrowUp")
+        next =
+          current < 0
+            ? options.length - 1
+            : (current - 1 + options.length) % options.length;
+      else if (keyboardEvent.key === "Home") next = 0;
+      else if (keyboardEvent.key === "End") next = options.length - 1;
+      else if (keyboardEvent.key === "Escape") {
+        event.preventDefault();
+        this.closeFilterDropdown(name);
+        trigger.focus();
+        return;
+      } else return;
+      event.preventDefault();
+      options[next]?.focus();
+    });
+  }
+
+  private dropdownOptions(name: DropdownName) {
+    return Array.from(
+      this.element(`${name}-menu`).querySelectorAll<HTMLElement>(
+        '[role="option"]',
+      ),
+    ) as HTMLElement[];
+  }
+
+  private renderFilterDropdown(name: DropdownName) {
+    const trigger = this.button(`${name}-trigger`);
+    const menu = this.element(`${name}-menu`);
+    const options =
+      name === "collection" ? this.collectionOptions : this.referenceOptions;
+    const value =
+      name === "collection" ? this.collection : this.referenceFilter;
+    const selected = options.find((option) => option.value === value);
+    trigger.textContent = selected?.label || getString("note-filter-all");
+    menu.replaceChildren();
+    for (const option of options) {
+      const item = this.create("button") as HTMLButtonElement;
+      item.type = "button";
+      item.className = "figure-dropdown-option";
+      item.style.display = "block";
+      item.style.width = "100%";
+      item.style.textAlign = "left";
+      item.dataset.value = option.value;
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", String(option.value === value));
+      item.tabIndex = -1;
+      item.textContent = option.label;
+      item.title = option.label;
+      item.addEventListener("click", () => {
+        if (name === "collection") {
+          this.collection = option.value;
+        } else {
+          this.referenceFilter = option.value as ReferenceFilter;
+        }
+        this.renderFilterDropdown(name);
+        this.render();
+        if (
+          name === "reference-filter" &&
+          this.referenceFilter !== "all" &&
+          !this.references
+        )
+          void this.scan();
+        this.closeFilterDropdown(name);
+        trigger.focus();
+      });
+      menu.append(item);
+    }
+  }
+
+  private closeFilterDropdown(name: DropdownName) {
+    const trigger = this.button(`${name}-trigger`);
+    this.element(`${name}-menu`).hidden = true;
+    trigger.parentElement?.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
   }
 
   private switchView(view: "library" | "trash") {
@@ -535,9 +657,6 @@ export class NoteManager {
   }
   private input(name: string) {
     return this.element(name) as HTMLInputElement;
-  }
-  private select(name: string) {
-    return this.element(name) as HTMLSelectElement;
   }
   private element(name: string) {
     const element = this.win.document.getElementById(

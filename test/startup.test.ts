@@ -91,6 +91,44 @@ describe("startup", function () {
           ?.getBoundingClientRect().width,
         0,
       );
+      const referenceTrigger = manager.document.getElementById(
+        `${config.addonRef}-note-reference-filter-trigger`,
+      ) as HTMLButtonElement;
+      const referenceMenu = manager.document.getElementById(
+        `${config.addonRef}-note-reference-filter-menu`,
+      ) as HTMLElement;
+      referenceTrigger.click();
+      assert.isFalse(referenceMenu.hidden);
+      assert.equal(referenceTrigger.getAttribute("aria-expanded"), "true");
+      assert.lengthOf(referenceMenu.querySelectorAll('[role="option"]'), 3);
+      assert.notEqual(
+        manager.getComputedStyle(referenceMenu).backgroundColor,
+        "rgba(0, 0, 0, 0)",
+      );
+      assert.closeTo(
+        referenceMenu.getBoundingClientRect().width,
+        referenceTrigger.getBoundingClientRect().width,
+        2,
+      );
+      (
+        referenceMenu.querySelector('[data-value="all"]') as HTMLButtonElement
+      ).click();
+      assert.isTrue(referenceMenu.hidden);
+      const collectionTrigger = manager.document.getElementById(
+        `${config.addonRef}-note-collection-trigger`,
+      ) as HTMLButtonElement;
+      assert.isAbove(collectionTrigger.getBoundingClientRect().width, 0);
+      const collectionMenu = manager.document.getElementById(
+        `${config.addonRef}-note-collection-menu`,
+      ) as HTMLElement;
+      collectionTrigger.click();
+      assert.isFalse(collectionMenu.hidden);
+      assert.notEqual(
+        manager.getComputedStyle(collectionMenu).backgroundColor,
+        "rgba(0, 0, 0, 0)",
+      );
+      collectionTrigger.click();
+      assert.isTrue(collectionMenu.hidden);
       (
         manager.document.getElementById(
           `${config.addonRef}-tab-figures`,

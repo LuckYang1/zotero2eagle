@@ -12,7 +12,7 @@
     <html:link rel="localization" href="__addonRef__-addon.ftl" />
     <html:link
       rel="stylesheet"
-      href="chrome://__addonRef__/content/overview.css"
+      href="chrome://__addonRef__/content/overview.css?revision=0.1.14"
     />
   </linkset>
 
@@ -224,32 +224,100 @@
         </html:div>
         <html:label
           class="figure-filter-label"
-          for="zotero2eagle-note-collection"
+          for="zotero2eagle-note-collection-trigger"
           data-l10n-id="overview-folders"
         ></html:label>
-        <html:select
-          id="zotero2eagle-note-collection"
-          class="figure-select"
-        ></html:select>
+        <html:div
+          class="figure-dropdown"
+          style="position: relative; margin: 8px 0 18px"
+        >
+          <html:button
+            id="zotero2eagle-note-collection-trigger"
+            class="figure-dropdown-trigger"
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="zotero2eagle-note-collection-menu"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              min-height: 34px;
+              padding: 7px 10px;
+              border: 1px solid var(--figure-border, #d8dee8);
+              border-radius: 7px;
+              background: var(--figure-button-bg, #fff);
+              color: var(--figure-text, #202733);
+              text-align: left;
+            "
+          ></html:button>
+          <html:div
+            id="zotero2eagle-note-collection-menu"
+            class="figure-dropdown-menu"
+            role="listbox"
+            hidden="hidden"
+            style="
+              position: absolute;
+              top: calc(100% + 4px);
+              left: 0;
+              right: 0;
+              z-index: 10;
+              max-height: 240px;
+              overflow-y: auto;
+              background: var(--figure-panel, #fbfcfe);
+              border: 1px solid var(--figure-border-strong, #c7d0dd);
+            "
+          ></html:div>
+        </html:div>
         <html:label
           class="figure-filter-label"
-          for="zotero2eagle-note-reference-filter"
+          for="zotero2eagle-note-reference-filter-trigger"
           data-l10n-id="note-references"
         ></html:label>
-        <html:select
-          id="zotero2eagle-note-reference-filter"
-          class="figure-select"
+        <html:div
+          class="figure-dropdown"
+          style="position: relative; margin: 8px 0 18px"
         >
-          <html:option value="all" data-l10n-id="note-filter-all"></html:option>
-          <html:option
-            value="referenced"
-            data-l10n-id="note-filter-referenced"
-          ></html:option>
-          <html:option
-            value="unreferenced"
-            data-l10n-id="note-filter-unreferenced"
-          ></html:option>
-        </html:select>
+          <html:button
+            id="zotero2eagle-note-reference-filter-trigger"
+            class="figure-dropdown-trigger"
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="zotero2eagle-note-reference-filter-menu"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              min-height: 34px;
+              padding: 7px 10px;
+              border: 1px solid var(--figure-border, #d8dee8);
+              border-radius: 7px;
+              background: var(--figure-button-bg, #fff);
+              color: var(--figure-text, #202733);
+              text-align: left;
+            "
+          ></html:button>
+          <html:div
+            id="zotero2eagle-note-reference-filter-menu"
+            class="figure-dropdown-menu"
+            role="listbox"
+            hidden="hidden"
+            style="
+              position: absolute;
+              top: calc(100% + 4px);
+              left: 0;
+              right: 0;
+              z-index: 10;
+              max-height: 240px;
+              overflow-y: auto;
+              background: var(--figure-panel, #fbfcfe);
+              border: 1px solid var(--figure-border-strong, #c7d0dd);
+            "
+          ></html:div>
+        </html:div>
         <html:button
           id="zotero2eagle-note-scan"
           class="figure-button figure-scan"

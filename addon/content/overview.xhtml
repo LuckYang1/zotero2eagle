@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<window
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  xmlns:html="http://www.w3.org/1999/xhtml"
+  id="zotero2eagle-image-manager-window"
+  title="Zotero2Eagle 图片管理器"
+  width="1180"
+  height="780"
+  persist="screenX screenY width height"
+>
+  <linkset>
+    <html:link rel="localization" href="__addonRef__-addon.ftl" />
+    <html:link
+      rel="stylesheet"
+      href="chrome://__addonRef__/content/overview.css"
+    />
+  </linkset>
+
+  <html:div class="figure-manager-shell">
+    <html:nav
+      class="figure-module-tabs"
+      role="tablist"
+      aria-label="Image modules"
+    >
+      <html:button
+        id="zotero2eagle-tab-figures"
+        class="is-active"
+        type="button"
+        role="tab"
+        aria-selected="true"
+        aria-controls="zotero2eagle-image-manager-root"
+        data-l10n-id="overview-tab-figures"
+      ></html:button>
+      <html:button
+        id="zotero2eagle-tab-notes"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="zotero2eagle-note-manager-root"
+        data-l10n-id="overview-tab-notes"
+      ></html:button>
+    </html:nav>
+    <html:main
+      id="zotero2eagle-image-manager-root"
+      class="figure-overview is-active"
+      role="tabpanel"
+      aria-labelledby="zotero2eagle-tab-figures"
+    >
+      <html:aside class="figure-sidebar">
+        <html:div class="figure-sidebar-header">
+          <html:h1 data-l10n-id="overview-title"></html:h1>
+          <html:button
+            id="zotero2eagle-image-manager-refresh"
+            class="figure-button"
+            type="button"
+            data-l10n-id="overview-refresh"
+          ></html:button>
+        </html:div>
+        <html:div class="figure-view-switch">
+          <html:button
+            id="zotero2eagle-image-manager-library"
+            class="figure-button"
+            type="button"
+            data-l10n-id="overview-library"
+          ></html:button>
+          <html:button
+            id="zotero2eagle-image-manager-trash"
+            class="figure-button"
+            type="button"
+            data-l10n-id="overview-trash"
+          ></html:button>
+        </html:div>
+        <html:div
+          class="figure-filter-label"
+          data-l10n-id="overview-folders"
+        ></html:div>
+        <html:div class="figure-collection-actions">
+          <html:button
+            id="zotero2eagle-image-manager-expand-all"
+            class="figure-button figure-button-compact"
+            type="button"
+            data-l10n-id="overview-expand-all"
+          ></html:button>
+          <html:button
+            id="zotero2eagle-image-manager-collapse-all"
+            class="figure-button figure-button-compact"
+            type="button"
+            data-l10n-id="overview-collapse-all"
+          ></html:button>
+        </html:div>
+        <html:div
+          id="zotero2eagle-image-manager-collections"
+          class="figure-collections"
+        ></html:div>
+      </html:aside>
+
+      <html:section class="figure-content">
+        <html:div class="figure-toolbar">
+          <html:input
+            id="zotero2eagle-image-manager-search"
+            class="figure-search"
+            type="search"
+            data-l10n-id="overview-search-pdf"
+            data-l10n-attrs="placeholder"
+          />
+          <html:div class="figure-toolbar-group figure-actions">
+            <html:button
+              id="zotero2eagle-image-manager-select-all"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-select-all"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-image-manager-save"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-save-eagle"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-image-manager-move-trash"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-move-trash"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-image-manager-restore"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-restore"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-image-manager-delete-forever"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-delete-forever"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-image-manager-empty-trash"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-empty-trash"
+            ></html:button>
+            <html:span
+              id="zotero2eagle-image-manager-selected-count"
+              class="figure-count"
+            ></html:span>
+          </html:div>
+          <html:div class="figure-toolbar-group">
+            <html:span
+              class="figure-filter-label"
+              data-l10n-id="overview-colors"
+            ></html:span>
+            <html:div
+              id="zotero2eagle-image-manager-colors"
+              class="figure-color-list"
+            ></html:div>
+          </html:div>
+          <html:label class="figure-size-control">
+            <html:span
+              class="figure-filter-label"
+              data-l10n-id="overview-size"
+            ></html:span>
+            <html:input
+              id="zotero2eagle-image-manager-size"
+              type="range"
+              min="140"
+              max="420"
+              step="20"
+            />
+          </html:label>
+          <html:div
+            id="zotero2eagle-image-manager-count"
+            class="figure-count"
+          ></html:div>
+        </html:div>
+        <html:div
+          id="zotero2eagle-image-manager-status"
+          class="figure-status"
+        ></html:div>
+        <html:div class="figure-grid-scroll">
+          <html:div
+            id="zotero2eagle-image-manager-grid"
+            class="figure-grid"
+          ></html:div>
+        </html:div>
+        <html:div
+          id="zotero2eagle-image-manager-context-menu"
+          class="figure-context-menu"
+          role="menu"
+          hidden="hidden"
+        ></html:div>
+      </html:section>
+    </html:main>
+    <html:main
+      id="zotero2eagle-note-manager-root"
+      class="figure-overview"
+      role="tabpanel"
+      aria-labelledby="zotero2eagle-tab-notes"
+      hidden="hidden"
+    >
+      <html:aside class="figure-sidebar">
+        <html:div class="figure-sidebar-header">
+          <html:h1 data-l10n-id="overview-tab-notes"></html:h1>
+          <html:button
+            id="zotero2eagle-note-refresh"
+            class="figure-button"
+            type="button"
+            data-l10n-id="overview-refresh"
+          ></html:button>
+        </html:div>
+        <html:div class="figure-view-switch">
+          <html:button
+            id="zotero2eagle-note-library"
+            class="figure-button is-active"
+            type="button"
+            data-l10n-id="overview-library"
+          ></html:button>
+          <html:button
+            id="zotero2eagle-note-trash"
+            class="figure-button"
+            type="button"
+            data-l10n-id="overview-trash"
+          ></html:button>
+        </html:div>
+        <html:label
+          class="figure-filter-label"
+          for="zotero2eagle-note-collection"
+          data-l10n-id="overview-folders"
+        ></html:label>
+        <html:select
+          id="zotero2eagle-note-collection"
+          class="figure-select"
+        ></html:select>
+        <html:label
+          class="figure-filter-label"
+          for="zotero2eagle-note-reference-filter"
+          data-l10n-id="note-references"
+        ></html:label>
+        <html:select
+          id="zotero2eagle-note-reference-filter"
+          class="figure-select"
+        >
+          <html:option value="all" data-l10n-id="note-filter-all"></html:option>
+          <html:option
+            value="referenced"
+            data-l10n-id="note-filter-referenced"
+          ></html:option>
+          <html:option
+            value="unreferenced"
+            data-l10n-id="note-filter-unreferenced"
+          ></html:option>
+        </html:select>
+        <html:button
+          id="zotero2eagle-note-scan"
+          class="figure-button figure-scan"
+          type="button"
+          data-l10n-id="note-scan"
+        ></html:button>
+        <html:div
+          id="zotero2eagle-note-scan-status"
+          class="figure-status"
+          role="status"
+        ></html:div>
+      </html:aside>
+      <html:section class="figure-content">
+        <html:div class="figure-toolbar">
+          <html:input
+            id="zotero2eagle-note-search"
+            class="figure-search"
+            type="search"
+            data-l10n-id="overview-search-note"
+            data-l10n-attrs="placeholder"
+          />
+          <html:div class="figure-toolbar-group figure-actions">
+            <html:button
+              id="zotero2eagle-note-select-all"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-select-all"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-note-save"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-save-eagle"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-note-move-trash"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-move-trash"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-note-restore"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-restore"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-note-delete-forever"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-delete-forever"
+            ></html:button>
+            <html:button
+              id="zotero2eagle-note-empty-trash"
+              class="figure-button figure-button-compact"
+              type="button"
+              data-l10n-id="overview-empty-trash"
+            ></html:button>
+          </html:div>
+          <html:span
+            id="zotero2eagle-note-selected-count"
+            class="figure-count"
+          ></html:span>
+          <html:span
+            id="zotero2eagle-note-count"
+            class="figure-count"
+          ></html:span>
+        </html:div>
+        <html:div
+          id="zotero2eagle-note-status"
+          class="figure-status"
+          role="status"
+        ></html:div>
+        <html:div class="figure-grid-scroll">
+          <html:div id="zotero2eagle-note-grid" class="figure-grid"></html:div>
+        </html:div>
+        <html:div
+          id="zotero2eagle-note-context-menu"
+          class="figure-context-menu"
+          role="menu"
+          hidden="hidden"
+        ></html:div>
+      </html:section>
+    </html:main>
+  </html:div>
+</window>

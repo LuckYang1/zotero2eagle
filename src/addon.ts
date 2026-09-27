@@ -2,6 +2,7 @@ import { config } from "../package.json";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
 import { AnnotationExportService } from "./services/annotationExport";
+import { openOverviewWindow } from "./modules/overview-window";
 
 class Addon {
   public data: {
@@ -23,7 +24,7 @@ class Addon {
   // Lifecycle hooks
   public hooks: typeof hooks;
   // APIs
-  public api: object;
+  public api: { openOverview: () => Window };
 
   constructor() {
     this.data = {
@@ -36,7 +37,7 @@ class Addon {
       annotationExport: new AnnotationExportService(),
     };
     this.hooks = hooks;
-    this.api = {};
+    this.api = { openOverview: () => openOverviewWindow() };
   }
 }
 

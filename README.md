@@ -12,6 +12,9 @@ Zotero2Eagle is a Zotero 9 and 10 plugin that exports PDF image annotations to E
 
 本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
+The image manager is adapted from [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview), licensed under AGPL-3.0-or-later.
+Its updated image management layout takes inspiration from [AlbusGuo/albus-imagine](https://github.com/AlbusGuo/albus-imagine), licensed under AGPL-3.0; the Zotero implementation uses its own controls and data model.
+
 ## Features
 
 - Export image annotations from Zotero PDFs into Eagle
@@ -19,6 +22,11 @@ Zotero2Eagle is a Zotero 9 and 10 plugin that exports PDF image annotations to E
 - Include title, authors, year, page number, attachment key, and annotation key
 - Support automatic import for newly created image annotations
 - Support manual export for selected annotations, PDF attachments, or top-level items
+- Browse image annotations in an image manager with collection and color filters, preview, and Reader navigation
+- Select visible images with checkboxes and save them to Eagle in a batch
+- Move images to the manager trash, restore them, or permanently delete their Zotero annotations
+- Search PDF annotations by source PDF filename and manage embedded note images in a separate tab
+- Scan Zotero notes for image references and find orphaned note image attachments
 
 ## Demo
 
@@ -56,6 +64,14 @@ Use the PDF reader annotation context menu:
 - Right-click one or more image annotations in the PDF reader
 - Choose `Export Selected Image Annotations to Eagle`
 
+## Image Manager
+
+Click the image icon in Zotero's top tab bar. Filter by collection or color, resize thumbnails, and double-click an image to open its source annotation. Right-click an image to save it to Eagle or move it to the manager trash. Use the card checkboxes and toolbar to act on multiple visible images.
+
+The manager trash persists across restarts. Moving an image there hides it from the manager but leaves the Zotero annotation intact. Restore it from the Trash view, or permanently delete selected images or empty the trash after confirmation. Permanent deletion removes the Zotero annotation and its local image cache. Notes, embedded image attachments, and the source PDF are preserved. Manual saves use the existing Eagle export behavior and can create another Eagle item when repeated.
+
+The Note Image Attachments tab lists images embedded in Zotero notes. Search by image filename, filter by Zotero collection, and run **Scan unreferenced images** to count image references across notes. Unscanned or failed scans are marked **Unchecked**. Open an image preview in the manager or open its source note in Zotero. Save selected attachment files to Eagle. Its trash is separate from the PDF annotation trash; only attachments verified as unreferenced at deletion time can be permanently deleted. Scanning never deletes images automatically.
+
 ## Development
 
 ```bash
@@ -66,7 +82,7 @@ npm test
 
 ## Release
 
-Current version: `v0.1.8`
+Current version: `v0.1.12`
 
 - Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 

@@ -2,6 +2,8 @@ import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
 import { logger } from "./utils/logger";
+import { installMainWindowUI, uninstallMainWindowUI } from "./modules/main-window";
+import { closeOverviewWindow, onOverviewWindowLoad, onOverviewWindowUnload } from "./modules/overview-window";
 
 let readerAnnotationMenuRegistered = false;
 
@@ -117,13 +119,18 @@ async function onStartup() {
   logger.info("hooks", "Zotero2Eagle started");
 }
 
-async function onMainWindowLoad(_win: _ZoteroTypes.MainWindow): Promise<void> {
+async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
   addon.data.ztoolkit = createZToolkit();
+  installMainWindowUI(win);
 }
 
-async function onMainWindowUnload(_win: Window): Promise<void> {}
+async function onMainWindowUnload(win: Window): Promise<void> {
+  uninstallMainWindowUI(win);
+}
 
 function onShutdown(): void {
+  closeOverviewWindow();
+  for (const win of Zotero.getMainWindows()) uninstallMainWindowUI(win);
   addon.data.annotationExport.shutdown();
   if (readerAnnotationMenuRegistered) {
     Zotero.Reader.unregisterEventListener(
@@ -158,4 +165,6 @@ export default {
   onMainWindowUnload,
   onNotify,
   onPrefsEvent,
+  onOverviewWindowLoad,
+  onOverviewWindowUnload,
 };

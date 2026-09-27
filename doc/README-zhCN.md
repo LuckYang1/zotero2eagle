@@ -10,6 +10,9 @@ Zotero2Eagle 是一个面向 Zotero 9 和 10 的插件，用于将 PDF 图片标
 
 本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
+图片管理器改编自 [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview)，源项目采用 AGPL-3.0-or-later 许可证。
+新版界面参考 [AlbusGuo/albus-imagine](https://github.com/AlbusGuo/albus-imagine) 的布局与交互，该项目采用 AGPL-3.0 许可证；Zotero 版使用自身的控件和数据模型。
+
 ## 功能
 
 - 将 Zotero PDF 中的图片标注导入 Eagle
@@ -17,6 +20,10 @@ Zotero2Eagle 是一个面向 Zotero 9 和 10 的插件，用于将 PDF 图片标
 - 保存标题、作者、年份、页码、attachment key、annotation key
 - 支持“新建图片标注后自动导入”
 - 支持对所选图片标注、PDF 附件或顶层文献手动导出
+- 提供图片管理器，可按集合和颜色筛选、预览并跳转到原始批注
+- 勾选多张图片后批量保存到 Eagle，或移入管理器回收站
+- 从管理器回收站恢复图片，或确认后永久删除 Zotero 图片批注
+- 单独管理笔记内嵌图片附件，扫描笔记引用并找出未引用图片
 
 ## 演示
 
@@ -96,6 +103,14 @@ npm run build
 - 选中一个或多个图片标注
 - 右键
 - 点击 `Export Selected Image Annotations to Eagle`
+
+### 图片管理器
+
+点击 Zotero 顶部标签栏的图片图标打开管理器。可按集合和颜色筛选、调整缩略图大小，双击图片跳转到 Zotero Reader。右键单张图片可保存至 Eagle 或移入回收站；勾选框和工具栏可批量操作当前可见图片。
+
+管理器回收站会在重启后保留。移入回收站只会在管理器中隐藏图片，原始 Zotero 批注仍存在；在回收站中可以恢复，或确认后永久删除所选批注、清空回收站。永久删除只删除 Zotero 图片批注及其本地缓存；笔记、笔记内嵌图片附件和原始 PDF 均保留。重复保存至 Eagle 沿用现有手动导出行为，可能生成新条目。
+
+管理器另有“笔记图片附件”页签，收录 Zotero 笔记的内嵌图片。可按图片附件文件名、Zotero 集合搜索与筛选，在管理器内预览，打开来源笔记，或把附件文件保存至 Eagle。“扫描未引用图片”会检查笔记中的图片元素并统计引用次数；未扫描或扫描失败时显示“未检查”。笔记图片使用独立回收站；永久删除前会重新检查引用，仅删除确认未引用的附件。扫描本身不会删除图片。
 
 ## 验证
 

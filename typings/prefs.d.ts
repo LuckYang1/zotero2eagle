@@ -11,6 +11,9 @@ declare namespace _ZoteroTypes {
       "eagleApiUrl": string;
       "eagleApiToken": string;
       "eagleFolderId": string;
+      "thumbnailSize": number;
+      "imageManagerTrash": string;
+      "noteImageManagerTrash": string;
     };
   }
 }

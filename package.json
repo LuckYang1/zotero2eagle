@@ -1,7 +1,7 @@
 {
   "name": "zotero2eagle",
   "type": "module",
-  "version": "0.1.8",
+  "version": "0.1.12",
   "description": "Export Zotero image annotations to Eagle with backlinks and metadata",
   "config": {
     "addonName": "Zotero2Eagle",
@@ -27,6 +27,7 @@
     "lint:fix": "prettier --write . && eslint . --fix",
     "release": "zotero-plugin release",
     "test": "zotero-plugin test",
+    "test:unit": "node --test unit/run.cjs",
     "update-deps": "npm update --save"
   },
   "dependencies": {

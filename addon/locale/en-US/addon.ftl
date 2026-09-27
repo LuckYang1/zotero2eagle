@@ -12,7 +12,9 @@ status-export-success = Export completed successfully.
 
 toolbar-button-tooltip = Open figure overview
 overview-title = Image Manager
-overview-refresh = Refresh
+overview-refresh =
+  .title = Refresh
+  .aria-label = Refresh
 overview-expand-all = Expand all
 overview-collapse-all = Collapse all
 overview-colors = Colors

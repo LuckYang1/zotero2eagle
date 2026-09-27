@@ -119,6 +119,7 @@ export class NoteManager {
     this.references = null;
     this.status(getString("note-loading"));
     this.updateActions();
+    this.button("refresh").classList.add("is-loading");
     try {
       const records = await collectNoteImages();
       if (version !== this.loadVersion) return;
@@ -137,6 +138,7 @@ export class NoteManager {
     } finally {
       if (version === this.loadVersion) {
         this.busy = false;
+        this.button("refresh").classList.remove("is-loading");
         this.updateActions();
       }
     }

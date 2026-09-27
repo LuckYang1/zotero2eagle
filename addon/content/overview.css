@@ -12,6 +12,7 @@
   --figure-button-bg: #ffffff;
   --figure-button-hover: #f0f4fa;
   --figure-shadow: 0 1px 2px rgb(24 34 50 / 8%);
+  --figure-card-hover-shadow: rgb(24 34 50 / 20%);
   --figure-card-width: 220px;
   --figure-image-height: 158px;
 }
@@ -30,6 +31,7 @@
     --figure-button-bg: #2c333d;
     --figure-button-hover: #343d49;
     --figure-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+    --figure-card-hover-shadow: rgb(0 0 0 / 42%);
   }
 }
 
@@ -340,6 +342,50 @@ input {
   font-size: 12px;
 }
 
+.figure-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border-radius: 7px;
+  color: var(--figure-muted);
+  flex-shrink: 0;
+}
+
+.figure-refresh-button:hover {
+  color: var(--figure-text);
+  background: var(--figure-button-hover);
+}
+
+.figure-refresh-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
+  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.figure-refresh-button:active .figure-refresh-icon {
+  transform: rotate(180deg);
+}
+
+.figure-refresh-button.is-loading .figure-refresh-icon {
+  animation: figure-spin 800ms linear infinite;
+}
+
+@keyframes figure-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .figure-button:hover {
   border-color: var(--figure-border-strong);
   background: var(--figure-button-hover);
@@ -417,7 +463,6 @@ input {
 
 .figure-button:focus-visible,
 .figure-disclosure:focus-visible,
-.figure-color-chip:focus-visible,
 .figure-card:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--figure-accent) 30%, transparent);
   outline-offset: 2px;
@@ -542,26 +587,72 @@ input {
 
 .figure-color-list {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 8px;
 }
 
 .figure-color-chip {
   appearance: none;
   -moz-appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 2px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: var(--chip-color);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
   cursor: pointer;
+  transition:
+    transform 140ms ease,
+    opacity 140ms ease,
+    box-shadow 140ms ease;
 }
 
-.figure-color-chip[aria-pressed="true"] {
-  border-color: var(--figure-accent);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--figure-accent) 20%, transparent);
+.figure-color-chip:hover {
+  transform: scale(1.1);
+}
+
+.figure-color-chip.is-dimmed {
+  opacity: 0.35;
+}
+
+.figure-color-chip.is-dimmed:hover {
+  opacity: 0.75;
+  transform: scale(1.05);
+}
+
+.figure-color-chip[aria-pressed="true"],
+.figure-color-chip.is-active {
+  box-shadow:
+    0 0 0 2px var(--figure-panel),
+    0 0 0 4px var(--chip-color);
+  transform: scale(1.05);
+}
+
+.figure-color-chip[aria-pressed="true"]::after,
+.figure-color-chip.is-active::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 8px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-0.5px, -0.5px);
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 60%));
+}
+
+.figure-color-chip:focus {
+  outline: none;
+}
+
+.figure-color-chip:focus-visible {
+  outline: 2px solid var(--figure-accent);
+  outline-offset: 3px;
 }
 
 .figure-size-control {
@@ -631,10 +722,30 @@ input {
   border-radius: 8px;
   background: var(--figure-panel);
   box-shadow: var(--figure-shadow);
+  transform: translateY(0);
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .figure-card:hover {
-  border-color: var(--figure-border-strong);
+  z-index: 1;
+  border-color: var(--figure-accent);
+  box-shadow:
+    0 0 0 0.1px color-mix(in srgb, var(--figure-accent) 40%, transparent),
+    0 14px 40px var(--figure-card-hover-shadow);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-card {
+    transition: none;
+  }
+
+  .figure-card:hover {
+    transform: none;
+  }
 }
 
 .figure-image-wrap {

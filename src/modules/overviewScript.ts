@@ -154,6 +154,8 @@ class OverviewController {
   private async reload(options: { forceRefresh?: boolean } = {}) {
     const reloadVersion = ++this.reloadVersion;
     this.getStatus().textContent = getString("overview-loading");
+    const refreshBtn = this.getRefreshButton();
+    refreshBtn.classList.add("is-loading");
     try {
       const records = await collectFigureAnnotations(options);
       if (reloadVersion !== this.reloadVersion) {
@@ -189,6 +191,10 @@ class OverviewController {
       this.getGrid().replaceChildren();
       this.getCount().textContent = "";
       this.getStatus().textContent = getString("overview-load-failed");
+    } finally {
+      if (reloadVersion === this.reloadVersion) {
+        refreshBtn.classList.remove("is-loading");
+      }
     }
   }
 
@@ -366,18 +372,48 @@ class OverviewController {
   private renderColors() {
     const container = this.getColors();
     container.replaceChildren();
-    for (const color of getAvailableColors(this.records)) {
+    const availableColors = getAvailableColors(this.records);
+    const isFiltered =
+      availableColors.length > 0 &&
+      this.filters.selectedColors.size < availableColors.length;
+
+    for (const color of availableColors) {
       const chip = createHTMLElement(this.win, "button");
       chip.className = "figure-color-chip";
       chip.type = "button";
       chip.style.setProperty("--chip-color", color);
-      chip.setAttribute(
-        "aria-pressed",
-        String(this.filters.selectedColors.has(color)),
-      );
+
+      const isSelected = this.filters.selectedColors.has(color);
+      const pressed = isFiltered && isSelected;
+      chip.setAttribute("aria-pressed", String(pressed));
+
+      if (isFiltered) {
+        chip.classList.toggle("is-active", isSelected);
+        chip.classList.toggle("is-dimmed", !isSelected);
+      }
+
       chip.setAttribute("title", color);
-      chip.addEventListener("click", () => {
-        toggleSetValue(this.filters.selectedColors, color);
+      chip.addEventListener("click", (event: MouseEvent) => {
+        if (!isFiltered) {
+          this.filters.selectedColors = new Set([color]);
+        } else if (event.ctrlKey || event.metaKey) {
+          toggleSetValue(this.filters.selectedColors, color);
+          if (
+            this.filters.selectedColors.size === 0 ||
+            this.filters.selectedColors.size === availableColors.length
+          ) {
+            this.filters.selectedColors = new Set(availableColors);
+          }
+        } else {
+          if (
+            this.filters.selectedColors.size === 1 &&
+            this.filters.selectedColors.has(color)
+          ) {
+            this.filters.selectedColors = new Set(availableColors);
+          } else {
+            this.filters.selectedColors = new Set([color]);
+          }
+        }
         this.render();
       });
       container.append(chip);

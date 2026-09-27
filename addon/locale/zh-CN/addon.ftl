@@ -12,7 +12,9 @@ status-export-success = 导出完成。
 
 toolbar-button-tooltip = 打开截图总览
 overview-title = 图片管理器
-overview-refresh = 刷新
+overview-refresh =
+  .title = 刷新
+  .aria-label = 刷新
 overview-expand-all = 展开全部
 overview-collapse-all = 收起全部
 overview-colors = 颜色

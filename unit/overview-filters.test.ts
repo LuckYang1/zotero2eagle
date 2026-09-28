@@ -8,6 +8,7 @@ import {
   getRecordCollectionKeys,
   matchesFigureFilenameSearch,
   recordMatchesOverviewFilters,
+  recordMatchesSingleCollection,
   setThumbnailSizeStyle,
   type FigureAnnotationRecord,
 } from "../src/modules/overview-filters";
@@ -94,6 +95,29 @@ test("record matches when color and any collection are selected", () => {
   assert.equal(
     recordMatchesOverviewFilters(record({ color: "#ffd400" }), filters),
     false,
+  );
+});
+
+test("single collection selection matches only that folder or library", () => {
+  const image = record({ libraryID: 1, collectionIDs: [5, 8] });
+  assert.equal(recordMatchesSingleCollection(image, "collection:5"), true);
+  assert.equal(recordMatchesSingleCollection(image, "collection:6"), false);
+  assert.equal(
+    recordMatchesSingleCollection(record({ collectionIDs: [8] }), "collection:5"),
+    false,
+  );
+  assert.equal(recordMatchesSingleCollection(image, "library:1"), true);
+  assert.equal(recordMatchesSingleCollection(image, "library:2"), false);
+  assert.equal(
+    recordMatchesSingleCollection(image, UNCATEGORIZED_COLLECTION_KEY),
+    false,
+  );
+  assert.equal(
+    recordMatchesSingleCollection(
+      record({ collectionIDs: [] }),
+      UNCATEGORIZED_COLLECTION_KEY,
+    ),
+    true,
   );
 });
 

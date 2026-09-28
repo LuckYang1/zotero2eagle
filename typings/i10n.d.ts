@@ -45,6 +45,8 @@ export type FluentMessageId =
   | 'overview-load-failed'
   | 'overview-loading'
   | 'overview-move-trash'
+  | 'overview-multi-collections'
+  | 'overview-multi-collections-close'
   | 'overview-open'
   | 'overview-open-failed'
   | 'overview-refresh'

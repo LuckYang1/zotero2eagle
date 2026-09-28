@@ -35,6 +35,7 @@ import {
   getAvailableColors,
   matchesFigureFilenameSearch,
   recordMatchesOverviewFilters,
+  recordMatchesSingleCollection,
   setThumbnailSizeStyle,
   type OverviewFilters,
 } from "./overview-filters";
@@ -54,6 +55,9 @@ class OverviewController {
   private sections: CollectionTreeSection[] = [];
   private collectionTreeState: CollectionTreeState =
     createCollapsedCollectionTreeState();
+  private collapsedLibraryKeys = new Set<string>();
+  private activeCollectionKey: string | null = null;
+  private multiCollectionMode = false;
   private imageObserver: IntersectionObserver | null = null;
   private lazyImageQueue: HTMLImageElement[] = [];
   private lazyImageQueueTimer: number | null = null;
@@ -183,13 +187,22 @@ class OverviewController {
       this.render();
     });
     this.getExpandAllButton().addEventListener("click", () => {
+      this.collapsedLibraryKeys.clear();
       this.collectionTreeState = expandAllCollectionNodes(this.sections);
       this.renderCollections();
     });
     this.getCollapseAllButton().addEventListener("click", () => {
+      this.collapsedLibraryKeys = new Set(
+        this.sections
+          .filter((section) => section.label.trim())
+          .map((section) => section.key),
+      );
       this.collectionTreeState = createCollapsedCollectionTreeState();
       this.renderCollections();
     });
+    this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-multi-collections",
+    ).addEventListener("click", () => this.toggleMultiCollectionMode());
     await this.reload();
   }
 
@@ -219,6 +232,9 @@ class OverviewController {
         writeTrashEntries(reconciled);
       }
       this.sections = getCollectionTreeSections(this.records);
+      this.activeCollectionKey = this.sections[0]?.key ?? null;
+      this.multiCollectionMode = false;
+      this.collapsedLibraryKeys.clear();
       this.collectionTreeState = createCollapsedCollectionTreeState();
       this.filters = createDefaultOverviewFilters(this.records);
       this.filters.thumbnailSize = clampThumbnailSize(getPref("thumbnailSize"));
@@ -290,7 +306,10 @@ class OverviewController {
   private getVisibleRecords() {
     let records = this.getViewRecords().filter(
       (record) =>
-        recordMatchesOverviewFilters(record, this.filters) &&
+        this.filters.selectedColors.has(record.color) &&
+        (this.multiCollectionMode
+          ? recordMatchesOverviewFilters(record, this.filters)
+          : recordMatchesSingleCollection(record, this.activeCollectionKey)) &&
         matchesFigureFilenameSearch(record, this.searchQuery),
     );
 
@@ -564,20 +583,89 @@ class OverviewController {
 
   private renderCollections() {
     const container = this.getCollections();
+    const multiButton = this.getElement<HTMLButtonElement>(
+      "zotero2eagle-image-manager-multi-collections",
+    );
+    multiButton.textContent = getString(
+      this.multiCollectionMode
+        ? "overview-multi-collections-close"
+        : "overview-multi-collections",
+    );
+    multiButton.classList.toggle("is-active", this.multiCollectionMode);
+    multiButton.setAttribute("aria-pressed", String(this.multiCollectionMode));
+    container.setAttribute("aria-multiselectable", String(this.multiCollectionMode));
     container.replaceChildren();
     for (const section of this.sections) {
       const sectionElement = createHTMLElement(this.win, "section");
       if (section.label.trim()) {
-        const title = createHTMLElement(this.win, "div");
-        title.className = "figure-library-title";
-        title.textContent = section.label;
-        sectionElement.append(title);
+        const row = createHTMLElement(this.win, "div");
+        row.className = "figure-collection-node figure-library-node";
+        row.classList.toggle(
+          "is-active",
+          !this.multiCollectionMode && this.activeCollectionKey === section.key,
+        );
+        row.setAttribute("role", "treeitem");
+        row.setAttribute("aria-selected", String(row.classList.contains("is-active")));
+        row.tabIndex = 0;
+
+        const disclosure = createHTMLElement(this.win, "button");
+        disclosure.className = "figure-disclosure";
+        disclosure.type = "button";
+        disclosure.disabled = !section.children.length;
+        const collapsed = this.collapsedLibraryKeys.has(section.key);
+        disclosure.textContent = collapsed ? "▸" : "▾";
+        disclosure.setAttribute("aria-expanded", String(!collapsed));
+        disclosure.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (collapsed) {
+            this.collapsedLibraryKeys.delete(section.key);
+          } else {
+            this.collapsedLibraryKeys.add(section.key);
+          }
+          this.renderCollections();
+        });
+        const icon = createHTMLElement(this.win, "span");
+        icon.className = "figure-collection-icon figure-collection-icon-library";
+        const label = createHTMLElement(this.win, "span");
+        label.className = "figure-collection-label";
+        label.textContent = section.label;
+        row.append(disclosure, icon, label);
+        const selectLibrary = () => {
+          this.multiCollectionMode = false;
+          this.activeCollectionKey = section.key;
+          this.render();
+        };
+        row.addEventListener("click", selectLibrary);
+        row.addEventListener("keydown", (event) => {
+          if (event.target !== row) return;
+          if ((event as KeyboardEvent).key === "Enter" || (event as KeyboardEvent).key === " ") {
+            event.preventDefault();
+            selectLibrary();
+          }
+        });
+        sectionElement.append(row);
       }
-      for (const node of section.children) {
-        this.appendCollectionNode(sectionElement, node, 0);
+      if (!this.collapsedLibraryKeys.has(section.key)) {
+        for (const node of section.children) {
+          this.appendCollectionNode(sectionElement, node, section.label.trim() ? 1 : 0);
+        }
       }
       container.append(sectionElement);
     }
+  }
+
+  private toggleMultiCollectionMode() {
+    if (this.multiCollectionMode) {
+      this.multiCollectionMode = false;
+    } else {
+      this.filters.selectedCollectionKeys =
+        this.activeCollectionKey?.startsWith(COLLECTION_KEY_PREFIX) ||
+        this.activeCollectionKey === UNCATEGORIZED_COLLECTION_KEY
+          ? new Set([this.activeCollectionKey])
+          : new Set(getAllCollectionKeys(this.sections));
+      this.multiCollectionMode = true;
+    }
+    this.render();
   }
 
   private appendCollectionNode(
@@ -588,26 +676,63 @@ class OverviewController {
     const row = createHTMLElement(this.win, "div");
     row.className = "figure-collection-node";
     row.style.setProperty("--depth", String(depth));
+    row.classList.toggle(
+      "is-active",
+      !this.multiCollectionMode && this.activeCollectionKey === node.key,
+    );
+    row.setAttribute("role", "treeitem");
+    row.setAttribute("aria-selected", String(row.classList.contains("is-active")));
+    row.tabIndex = 0;
 
-    const checkbox = createHTMLElement(this.win, "input");
-    checkbox.type = "checkbox";
-    checkbox.checked = this.filters.selectedCollectionKeys.has(node.key);
-    checkbox.addEventListener("change", () => {
+    const toggleMultiSelection = (checked: boolean) => {
       const keys = [node.key, ...getDescendantKeys(node)];
       for (const key of keys) {
-        if (checkbox.checked) {
+        if (checked) {
           this.filters.selectedCollectionKeys.add(key);
         } else {
           this.filters.selectedCollectionKeys.delete(key);
         }
       }
       this.render();
-    });
+    };
 
-    const label = createHTMLElement(this.win, "label");
+    const label = createHTMLElement(this.win, "span");
+    label.className = "figure-collection-label";
     label.textContent = node.label;
     const disclosure = this.createDisclosureButton(node);
-    row.append(disclosure, checkbox, label);
+    row.append(disclosure);
+    if (this.multiCollectionMode) {
+      const checkbox = createHTMLElement(this.win, "input");
+      checkbox.type = "checkbox";
+      checkbox.checked = this.filters.selectedCollectionKeys.has(node.key);
+      checkbox.setAttribute("aria-label", node.label);
+      checkbox.addEventListener("click", (event) => event.stopPropagation());
+      checkbox.addEventListener("change", () =>
+        toggleMultiSelection(checkbox.checked),
+      );
+      row.append(checkbox);
+    }
+    const icon = createHTMLElement(this.win, "span");
+    icon.className = `figure-collection-icon figure-collection-icon-${
+      node.key === UNCATEGORIZED_COLLECTION_KEY ? "unfiled" : "folder"
+    }`;
+    row.append(icon, label);
+    const selectNode = () => {
+      if (this.multiCollectionMode) {
+        toggleMultiSelection(!this.filters.selectedCollectionKeys.has(node.key));
+      } else {
+        this.activeCollectionKey = node.key;
+        this.render();
+      }
+    };
+    row.addEventListener("click", selectNode);
+    row.addEventListener("keydown", (event) => {
+      if (event.target !== row) return;
+      if ((event as KeyboardEvent).key === "Enter" || (event as KeyboardEvent).key === " ") {
+        event.preventDefault();
+        selectNode();
+      }
+    });
     container.append(row);
 
     if (this.collectionTreeState.expandedCollectionKeys.has(node.key)) {
@@ -632,7 +757,8 @@ class OverviewController {
     );
     button.textContent = expanded ? "▾" : "▸";
     button.setAttribute("aria-expanded", String(expanded));
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
       if (expanded) {
         this.collectionTreeState.expandedCollectionKeys.delete(node.key);
       } else {

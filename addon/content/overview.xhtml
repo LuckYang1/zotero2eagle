@@ -13,7 +13,7 @@
     <html:link
       id="zotero2eagle-overview-stylesheet"
       rel="stylesheet"
-      href="chrome://__addonRef__/content/overview.css?revision=note-toolbar-controls-1"
+      href="chrome://__addonRef__/content/overview.css?revision=collection-tree-1"
     />
   </linkset>
 
@@ -108,10 +108,17 @@
             type="button"
             data-l10n-id="overview-collapse-all"
           ></html:button>
+          <html:button
+            id="zotero2eagle-image-manager-multi-collections"
+            class="figure-button figure-button-compact"
+            type="button"
+            aria-pressed="false"
+          ></html:button>
         </html:div>
         <html:div
           id="zotero2eagle-image-manager-collections"
           class="figure-collections"
+          role="tree"
         ></html:div>
       </html:aside>
 

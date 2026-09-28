@@ -48,6 +48,25 @@ export function recordMatchesOverviewFilters(
   );
 }
 
+export function recordMatchesSingleCollection(
+  record: FigureAnnotationRecord,
+  selectionKey: string | null,
+) {
+  if (!selectionKey) return true;
+  if (selectionKey === UNCATEGORIZED_COLLECTION_KEY) {
+    return record.collectionIDs.length === 0;
+  }
+  if (selectionKey.startsWith("library:")) {
+    return record.libraryID === Number(selectionKey.slice("library:".length));
+  }
+  if (selectionKey.startsWith(COLLECTION_KEY_PREFIX)) {
+    return record.collectionIDs.includes(
+      Number(selectionKey.slice(COLLECTION_KEY_PREFIX.length)),
+    );
+  }
+  return false;
+}
+
 export function matchesFigureFilenameSearch(
   record: FigureAnnotationRecord,
   query: string,

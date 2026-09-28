@@ -1,5 +1,4 @@
 import { getString } from "../utils/locale";
-import { config } from "../../package.json";
 import { exportNoteImages } from "../services/noteImageExport";
 import {
   collectNoteImages,
@@ -16,6 +15,7 @@ import {
   clampThumbnailSize,
   setThumbnailSizeStyle,
 } from "./overview-filters";
+import { initImageSortControls } from "./image-sort-controls";
 
 const NS = "http://www.w3.org/1999/xhtml";
 type ReferenceFilter = "all" | "referenced" | "unreferenced";
@@ -29,11 +29,13 @@ export class NoteManager {
   private references: Map<string, NoteReference[]> | null = null;
   private view: "library" | "trash" = "library";
   private query = "";
-  private sortField =
-    getPref("defaultSortField") === "color"
+  private sort = {
+    field: getPref("defaultSortField") === "color"
       ? "dateModified"
-      : getPref("defaultSortField") || "dateModified";
-  private sortOrder = getPref("defaultSortOrder") || "desc";
+      : getPref("defaultSortField") || "dateModified",
+    order: getPref("defaultSortOrder") || "desc",
+  };
+  private sortControls?: ReturnType<typeof initImageSortControls>;
   private thumbnailSize = clampThumbnailSize(getPref("noteThumbnailSize"));
   private collection = "all";
   private collectionOptions: DropdownOption[] = [];
@@ -60,7 +62,12 @@ export class NoteManager {
     this.initFilterDropdown("collection");
     this.initFilterDropdown("reference-filter");
     this.renderFilterDropdown("reference-filter");
-    this.initSortControls();
+    this.sortControls = initImageSortControls(
+      this.win.document,
+      "zotero2eagle-note",
+      this.sort,
+      () => this.render(),
+    );
     this.input("size").value = String(this.thumbnailSize);
     setThumbnailSizeStyle(this.element("grid"), this.thumbnailSize);
     this.input("size").addEventListener("input", () => {
@@ -106,7 +113,7 @@ export class NoteManager {
     });
     this.win.document.addEventListener("click", () => {
       this.hideMenu();
-      this.hideSortMenu();
+      this.sortControls?.hideMenu();
     });
     this.win.document.addEventListener("click", (event) => {
       const target = event.target as Node;
@@ -118,74 +125,10 @@ export class NoteManager {
     this.win.document.addEventListener("keydown", (event) => {
       if ((event as KeyboardEvent).key === "Escape") {
         this.hideMenu();
-        this.hideSortMenu();
+        this.sortControls?.hideMenu();
       }
     });
     await this.reload();
-  }
-
-  private initSortControls() {
-    const fieldButton = this.button("sort-field");
-    const menu = this.element("sort-menu");
-    const fieldLabel = getString("overview-sort-field");
-    fieldButton.setAttribute("aria-label", fieldLabel);
-    this.element("sort-field-tooltip").textContent = fieldLabel;
-    this.updateSortFieldMenu();
-    fieldButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      menu.hidden = !menu.hidden;
-      fieldButton.setAttribute("aria-expanded", String(!menu.hidden));
-      if (!menu.hidden) {
-        menu.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
-      }
-    });
-    for (const option of menu.querySelectorAll<HTMLButtonElement>(
-      "[data-sort-field]",
-    )) {
-      option.addEventListener("click", (event: Event) => {
-        event.stopPropagation();
-        this.sortField = option.dataset.sortField || "dateModified";
-        this.updateSortFieldMenu();
-        this.hideSortMenu();
-        fieldButton.focus();
-        this.render();
-      });
-    }
-    this.updateSortOrderButton();
-    this.button("sort-order").addEventListener("click", () => {
-      this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
-      this.updateSortOrderButton();
-      this.render();
-    });
-  }
-
-  private updateSortFieldMenu() {
-    for (const option of this.element("sort-menu").querySelectorAll<HTMLButtonElement>(
-      "[data-sort-field]",
-    )) {
-      option.setAttribute(
-        "aria-checked",
-        String(option.dataset.sortField === this.sortField),
-      );
-    }
-  }
-
-  private updateSortOrderButton() {
-    const button = this.button("sort-order");
-    const order = this.sortOrder === "asc" ? "asc" : "desc";
-    const label = getString(`overview-sort-${order}`);
-    const icon = button.querySelector<HTMLImageElement>("img");
-    if (icon) {
-      icon.src = `chrome://${config.addonRef}/content/icons/arrow-${order === "asc" ? "up" : "down"}.svg`;
-    }
-    button.dataset.order = order;
-    button.setAttribute("aria-label", label);
-    this.element("sort-order-tooltip").textContent = label;
-  }
-
-  private hideSortMenu() {
-    this.element("sort-menu").hidden = true;
-    this.button("sort-field").setAttribute("aria-expanded", "false");
   }
 
   teardown() {
@@ -193,7 +136,7 @@ export class NoteManager {
       this.win.clearTimeout(this.previewClickTimer);
     this.loadVersion += 1;
     this.hideMenu();
-    this.hideSortMenu();
+    this.sortControls?.hideMenu();
     this.closeFilterDropdown("collection");
     this.closeFilterDropdown("reference-filter");
     this.element("grid").replaceChildren();
@@ -460,7 +403,7 @@ export class NoteManager {
 
     filtered.sort((a, b) => {
       let cmp: number;
-      switch (this.sortField) {
+      switch (this.sort.field) {
         case "title":
           cmp = (a.noteTitle || "").localeCompare(b.noteTitle || "");
           break;
@@ -478,7 +421,7 @@ export class NoteManager {
       if (cmp === 0) {
         cmp = a.key.localeCompare(b.key);
       }
-      return this.sortOrder === "asc" ? cmp : -cmp;
+      return this.sort.order === "asc" ? cmp : -cmp;
     });
 
     return filtered;

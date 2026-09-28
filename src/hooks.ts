@@ -1,6 +1,5 @@
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
-import { createZToolkit } from "./utils/ztoolkit";
 import { logger } from "./utils/logger";
 import { installMainWindowUI, uninstallMainWindowUI } from "./modules/main-window";
 import { closeOverviewWindow, onOverviewWindowLoad, onOverviewWindowUnload } from "./modules/overview-window";
@@ -120,7 +119,6 @@ async function onStartup() {
 }
 
 async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
-  addon.data.ztoolkit = createZToolkit();
   installMainWindowUI(win);
 }
 

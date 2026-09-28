@@ -10,8 +10,7 @@ export interface ReaderOpenLike {
 }
 
 export type FigureReaderLocation =
-  | { annotationID: string }
-  | { position: FigureAnnotationPosition };
+  { annotationID: string } | { position: FigureAnnotationPosition };
 
 export function buildReaderLocation(
   record: FigureAnnotationRecord,

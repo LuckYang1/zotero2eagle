@@ -103,7 +103,7 @@ export async function collectNoteImages(): Promise<NoteImageRecord[]> {
   const records: NoteImageRecord[] = [];
   for (const id of ids) {
     const item = await Zotero.Items.getAsync(id);
-    if (!item?.isEmbeddedImageAttachment?.()) continue;
+    if (!item || !item.isEmbeddedImageAttachment()) continue;
     await item.loadAllData();
     const note = item.parentItem;
     if (!note?.isNote?.() || note.deleted) continue;
@@ -146,7 +146,7 @@ export async function scanNoteReferences(
     if (extractEmbeddedImageKeys(row.html ?? "").length) {
       try {
         const note = await Zotero.Items.getAsync(row.id);
-        if (note?.isNote?.()) {
+        if (note && note.isNote()) {
           await note.loadAllData();
           title = note.getDisplayTitle() || row.key;
         }
@@ -218,7 +218,8 @@ export async function deleteUnreferencedNoteImage(
   const item = await Zotero.Items.getAsync(record.id);
   if (item) await item.loadAllData();
   if (
-    !item?.isEmbeddedImageAttachment?.() ||
+    !item ||
+    !item.isEmbeddedImageAttachment() ||
     item.key !== record.key ||
     item.libraryID !== record.libraryID ||
     item.parentItemID !== record.noteID

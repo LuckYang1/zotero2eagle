@@ -465,7 +465,7 @@ export class NoteManager {
         if (this.previewClickTimer !== null)
           this.win.clearTimeout(this.previewClickTimer);
         this.previewClickTimer = null;
-        this.openNote(record.noteID);
+        this.openNote(record.noteID, getPref("noteDoubleClickOpenMode") === "tab");
       });
       card.addEventListener("keydown", (event) => {
         if ((event as KeyboardEvent).key === "Enter")
@@ -598,13 +598,13 @@ export class NoteManager {
     });
   }
 
-  private openNote(id: number) {
+  private openNote(id: number, openInTab = false) {
     try {
       const pane =
         (Zotero as any).getActiveZoteroPane?.() ||
         (Zotero.getMainWindow() as any).ZoteroPane;
       if (!pane?.openNote) throw new Error("Zotero note editor is unavailable");
-      pane.openNote(id, { openInWindow: true });
+      pane.openNote(id, { openInWindow: !openInTab });
     } catch (error) {
       this.log(error);
       this.status(getString("note-open-failed"));

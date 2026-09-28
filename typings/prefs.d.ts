@@ -17,6 +17,7 @@ declare namespace _ZoteroTypes {
       "showModifiedTime": boolean;
       "defaultSortField": string;
       "defaultSortOrder": string;
+      "noteDoubleClickOpenMode": string;
       "excludeFolders": string;
       "confirmDelete": boolean;
       "imageManagerTrash": string;

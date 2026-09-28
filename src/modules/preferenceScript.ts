@@ -59,6 +59,14 @@ async function updatePrefsUI() {
     sortOrderSelect.value = getPref("defaultSortOrder") || "desc";
   }
 
+  const noteOpenModeSelect = getDocument()?.getElementById(
+    prefId("note-double-click-open-mode"),
+  ) as HTMLSelectElement | null;
+  if (noteOpenModeSelect) {
+    noteOpenModeSelect.value =
+      getPref("noteDoubleClickOpenMode") === "tab" ? "tab" : "window";
+  }
+
   const excludeTextarea = getDocument()?.getElementById(
     prefId("exclude-folders"),
   ) as HTMLTextAreaElement | null;
@@ -165,6 +173,15 @@ function bindPrefEvents() {
     ?.addEventListener("change", (event: Event) => {
       setPref(
         "defaultSortOrder",
+        (event.target as HTMLSelectElement).value,
+      );
+    });
+
+  getDocument()
+    ?.getElementById(prefId("note-double-click-open-mode"))
+    ?.addEventListener("change", (event: Event) => {
+      setPref(
+        "noteDoubleClickOpenMode",
         (event.target as HTMLSelectElement).value,
       );
     });

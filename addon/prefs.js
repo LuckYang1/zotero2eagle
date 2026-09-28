@@ -8,6 +8,7 @@ pref("showFileSize", true);
 pref("showModifiedTime", true);
 pref("defaultSortField", "dateModified");
 pref("defaultSortOrder", "desc");
+pref("noteDoubleClickOpenMode", "window");
 pref("excludeFolders", "");
 pref("confirmDelete", true);
 pref("imageManagerTrash", "[]");

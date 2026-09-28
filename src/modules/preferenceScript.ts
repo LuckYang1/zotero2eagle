@@ -171,19 +171,13 @@ function bindPrefEvents() {
   getDocument()
     ?.getElementById(prefId("sort-field"))
     ?.addEventListener("change", (event: Event) => {
-      setPref(
-        "defaultSortField",
-        (event.target as HTMLSelectElement).value,
-      );
+      setPref("defaultSortField", (event.target as HTMLSelectElement).value);
     });
 
   getDocument()
     ?.getElementById(prefId("sort-order"))
     ?.addEventListener("change", (event: Event) => {
-      setPref(
-        "defaultSortOrder",
-        (event.target as HTMLSelectElement).value,
-      );
+      setPref("defaultSortOrder", (event.target as HTMLSelectElement).value);
     });
 
   getDocument()
@@ -198,10 +192,7 @@ function bindPrefEvents() {
   getDocument()
     ?.getElementById(prefId("exclude-folders"))
     ?.addEventListener("input", (event: Event) => {
-      setPref(
-        "excludeFolders",
-        (event.target as HTMLTextAreaElement).value,
-      );
+      setPref("excludeFolders", (event.target as HTMLTextAreaElement).value);
     });
 
   getInputElement(prefId("confirm-delete"))?.addEventListener(

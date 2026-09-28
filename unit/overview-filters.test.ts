@@ -103,7 +103,10 @@ test("single collection selection matches only that folder or library", () => {
   assert.equal(recordMatchesSingleCollection(image, "collection:5"), true);
   assert.equal(recordMatchesSingleCollection(image, "collection:6"), false);
   assert.equal(
-    recordMatchesSingleCollection(record({ collectionIDs: [8] }), "collection:5"),
+    recordMatchesSingleCollection(
+      record({ collectionIDs: [8] }),
+      "collection:5",
+    ),
     false,
   );
   assert.equal(recordMatchesSingleCollection(image, "library:1"), true);

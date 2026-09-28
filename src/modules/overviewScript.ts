@@ -285,11 +285,14 @@ class OverviewController {
 
     const excludeStr = getPref("excludeFolders") as string | undefined;
     if (excludeStr) {
-      const excludes = excludeStr.split('\n').map(s => s.trim()).filter(Boolean);
+      const excludes = excludeStr
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (excludes.length > 0) {
-        records = records.filter(record => {
+        records = records.filter((record) => {
           if (!record.filePath) return true;
-          return !excludes.some(ex => record.filePath!.includes(ex));
+          return !excludes.some((ex) => record.filePath!.includes(ex));
         });
       }
     }
@@ -347,7 +350,9 @@ class OverviewController {
     const visibleRecords = this.getVisibleRecords();
     const allSelected =
       visibleRecords.length > 0 &&
-      visibleRecords.every((record) => this.selected.has(recordIdentity(record)));
+      visibleRecords.every((record) =>
+        this.selected.has(recordIdentity(record)),
+      );
     const selectAllButton = button("select-all");
     selectAllButton.disabled = this.busy || !visibleRecords.length;
     selectAllButton.setAttribute("aria-pressed", String(allSelected));
@@ -523,7 +528,10 @@ class OverviewController {
     );
     multiButton.classList.toggle("is-active", this.multiCollectionMode);
     multiButton.setAttribute("aria-pressed", String(this.multiCollectionMode));
-    container.setAttribute("aria-multiselectable", String(this.multiCollectionMode));
+    container.setAttribute(
+      "aria-multiselectable",
+      String(this.multiCollectionMode),
+    );
     container.replaceChildren();
     for (const section of this.sections) {
       const sectionElement = createHTMLElement(this.win, "section");
@@ -535,7 +543,10 @@ class OverviewController {
           !this.multiCollectionMode && this.activeCollectionKey === section.key,
         );
         row.setAttribute("role", "treeitem");
-        row.setAttribute("aria-selected", String(row.classList.contains("is-active")));
+        row.setAttribute(
+          "aria-selected",
+          String(row.classList.contains("is-active")),
+        );
         row.tabIndex = 0;
 
         const disclosure = createHTMLElement(this.win, "button");
@@ -555,7 +566,8 @@ class OverviewController {
           this.renderCollections();
         });
         const icon = createHTMLElement(this.win, "span");
-        icon.className = "figure-collection-icon figure-collection-icon-library";
+        icon.className =
+          "figure-collection-icon figure-collection-icon-library";
         const label = createHTMLElement(this.win, "span");
         label.className = "figure-collection-label";
         label.textContent = section.label;
@@ -568,7 +580,10 @@ class OverviewController {
         row.addEventListener("click", selectLibrary);
         row.addEventListener("keydown", (event) => {
           if (event.target !== row) return;
-          if ((event as KeyboardEvent).key === "Enter" || (event as KeyboardEvent).key === " ") {
+          if (
+            (event as KeyboardEvent).key === "Enter" ||
+            (event as KeyboardEvent).key === " "
+          ) {
             event.preventDefault();
             selectLibrary();
           }
@@ -577,7 +592,11 @@ class OverviewController {
       }
       if (!this.collapsedLibraryKeys.has(section.key)) {
         for (const node of section.children) {
-          this.appendCollectionNode(sectionElement, node, section.label.trim() ? 1 : 0);
+          this.appendCollectionNode(
+            sectionElement,
+            node,
+            section.label.trim() ? 1 : 0,
+          );
         }
       }
       container.append(sectionElement);
@@ -611,7 +630,10 @@ class OverviewController {
       !this.multiCollectionMode && this.activeCollectionKey === node.key,
     );
     row.setAttribute("role", "treeitem");
-    row.setAttribute("aria-selected", String(row.classList.contains("is-active")));
+    row.setAttribute(
+      "aria-selected",
+      String(row.classList.contains("is-active")),
+    );
     row.tabIndex = 0;
 
     const toggleMultiSelection = (checked: boolean) => {
@@ -649,7 +671,9 @@ class OverviewController {
     row.append(icon, label);
     const selectNode = () => {
       if (this.multiCollectionMode) {
-        toggleMultiSelection(!this.filters.selectedCollectionKeys.has(node.key));
+        toggleMultiSelection(
+          !this.filters.selectedCollectionKeys.has(node.key),
+        );
       } else {
         this.activeCollectionKey = node.key;
         this.render();
@@ -658,7 +682,10 @@ class OverviewController {
     row.addEventListener("click", selectNode);
     row.addEventListener("keydown", (event) => {
       if (event.target !== row) return;
-      if ((event as KeyboardEvent).key === "Enter" || (event as KeyboardEvent).key === " ") {
+      if (
+        (event as KeyboardEvent).key === "Enter" ||
+        (event as KeyboardEvent).key === " "
+      ) {
         event.preventDefault();
         selectNode();
       }
@@ -842,8 +869,11 @@ class OverviewController {
               if (file && file.exists() && file.isFile()) {
                 const bytes = file.fileSize;
                 if (bytes < 1024) sizeSpan.textContent = bytes + " B";
-                else if (bytes < 1024 * 1024) sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
-                else sizeSpan.textContent = (bytes / (1024 * 1024)).toFixed(1) + " MB";
+                else if (bytes < 1024 * 1024)
+                  sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
+                else
+                  sizeSpan.textContent =
+                    (bytes / (1024 * 1024)).toFixed(1) + " MB";
               }
             } catch (e) {
               // ignore
@@ -858,7 +888,7 @@ class OverviewController {
           if (record.dateModified) {
             const d = new Date(record.dateModified.replace(" ", "T"));
             if (!isNaN(d.getTime())) {
-              timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+              timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
             }
           }
           infoRow.append(timeSpan);

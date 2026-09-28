@@ -6,14 +6,13 @@
 
 [![zotero target version](https://img.shields.io/badge/Zotero-9%20or%2010-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-Zotero2Eagle is a Zotero 9 and 10 plugin that exports PDF image annotations to Eagle and preserves a backlink to the source PDF.
+Zotero2Eagle is an image-focused plugin that exports PDF image annotations to Eagle and preserves a backlink to the source PDF. It also brings an Eagle-like image manager tab directly into Zotero.
 
-[简体中文说明](./doc/README-zhCN.md)
+[Simplified Chinese](./doc/README-zhCN.md)
 
-本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
+This project builds on [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle). Thanks to the original author for their outstanding work.
 
-The image manager is adapted from [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview), licensed under AGPL-3.0-or-later.
-Its updated image management layout takes inspiration from [AlbusGuo/albus-imagine](https://github.com/AlbusGuo/albus-imagine), licensed under AGPL-3.0; the Zotero implementation uses its own controls and data model.
+The image manager is adapted from [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview), licensed under AGPL-3.0-or-later. Since the original repository is no longer being updated and does not support newer Zotero versions, its functionality has been integrated into this repository. Thanks to the original author for their outstanding work.
 
 ## Features
 
@@ -47,6 +46,14 @@ Select one or more image annotations, right-click, and export to Eagle.
 ![Backlinks & Auto Tags](doc/data/双向链接已经自动标签.gif)
 
 Each imported item in Eagle includes a `zotero://` backlink and auto-generated tags (title, authors, year, page number, etc.).
+
+### Image Manager
+
+![Image Manager](doc/data/图片管理器.png)
+
+![Note Image Attachments](doc/data/笔记图片附件.png)
+
+An Eagle-like image manager inside Zotero automatically collects image annotations created with the PDF area selection tool. It also manages image attachments embedded in notes.
 
 ## Configuration
 
@@ -82,7 +89,7 @@ npm test
 
 ## Release
 
-Current version: `v0.1.15`
+Current version: `v0.2.0`
 
 - Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 

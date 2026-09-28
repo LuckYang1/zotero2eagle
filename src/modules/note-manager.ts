@@ -8,13 +8,16 @@ import {
   type NoteImageRecord,
   type NoteReference,
 } from "./note-images";
-import { readNoteTrashEntries, reconcileTrashEntries, recordIdentity, writeNoteTrashEntries, type TrashEntry } from "./image-manager-trash";
+import {
+  readNoteTrashEntries,
+  reconcileTrashEntries,
+  recordIdentity,
+  writeNoteTrashEntries,
+  type TrashEntry,
+} from "./image-manager-trash";
 import { showImagePreview } from "./image-preview";
 import { getPref, setPref } from "../utils/prefs";
-import {
-  clampThumbnailSize,
-  setThumbnailSizeStyle,
-} from "./overview-filters";
+import { clampThumbnailSize, setThumbnailSizeStyle } from "./overview-filters";
 import { initImageSortControls } from "./image-sort-controls";
 
 const NS = "http://www.w3.org/1999/xhtml";
@@ -30,9 +33,10 @@ export class NoteManager {
   private view: "library" | "trash" = "library";
   private query = "";
   private sort = {
-    field: getPref("defaultSortField") === "color"
-      ? "dateModified"
-      : getPref("defaultSortField") || "dateModified",
+    field:
+      getPref("defaultSortField") === "color"
+        ? "dateModified"
+        : getPref("defaultSortField") || "dateModified",
     order: getPref("defaultSortOrder") || "desc",
   };
   private sortControls?: ReturnType<typeof initImageSortControls>;
@@ -382,7 +386,7 @@ export class NoteManager {
             ),
           ])
         : new Set([this.collection]);
-    
+
     let filtered = filterNoteImages(this.viewRecords(), {
       query: this.query,
       collectionKeys,
@@ -392,11 +396,14 @@ export class NoteManager {
 
     const excludeStr = getPref("excludeFolders") as string | undefined;
     if (excludeStr) {
-      const excludes = excludeStr.split('\n').map(s => s.trim()).filter(Boolean);
+      const excludes = excludeStr
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (excludes.length > 0) {
-        filtered = filtered.filter(record => {
+        filtered = filtered.filter((record) => {
           if (!record.filePath) return true;
-          return !excludes.some(ex => record.filePath!.includes(ex));
+          return !excludes.some((ex) => record.filePath!.includes(ex));
         });
       }
     }
@@ -465,7 +472,10 @@ export class NoteManager {
         if (this.previewClickTimer !== null)
           this.win.clearTimeout(this.previewClickTimer);
         this.previewClickTimer = null;
-        this.openNote(record.noteID, getPref("noteDoubleClickOpenMode") === "tab");
+        this.openNote(
+          record.noteID,
+          getPref("noteDoubleClickOpenMode") === "tab",
+        );
       });
       card.addEventListener("keydown", (event) => {
         if ((event as KeyboardEvent).key === "Enter")
@@ -544,14 +554,17 @@ export class NoteManager {
               if (showSize) {
                 const bytes = file.fileSize;
                 if (bytes < 1024) sizeSpan.textContent = bytes + " B";
-                else if (bytes < 1024 * 1024) sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
-                else sizeSpan.textContent = (bytes / (1024 * 1024)).toFixed(1) + " MB";
+                else if (bytes < 1024 * 1024)
+                  sizeSpan.textContent = (bytes / 1024).toFixed(1) + " KB";
+                else
+                  sizeSpan.textContent =
+                    (bytes / (1024 * 1024)).toFixed(1) + " MB";
               }
               if (showTime) {
                 const ms = file.lastModifiedTime;
                 const d = new Date(ms);
                 if (!isNaN(d.getTime())) {
-                  timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                  timeSpan.textContent = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
                 }
               }
             }

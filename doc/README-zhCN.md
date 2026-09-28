@@ -6,12 +6,11 @@
 
 [![zotero target version](https://img.shields.io/badge/Zotero-9%20or%2010-green?style=flat-square&logo=zotero&logoColor=CC2936)](https://www.zotero.org) [![Using Zotero Plugin Template](https://img.shields.io/badge/Using-Zotero%20Plugin%20Template-blue?style=flat-square&logo=github)](https://github.com/windingwind/zotero-plugin-template)
 
-Zotero2Eagle 是一个面向 Zotero 9 和 10 的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。
+Zotero2Eagle 是一个专注于图片管理的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。同时集成了一个类似eagle图片管理标签可以直接在zotero中使用
 
 本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
-图片管理器改编自 [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview)，源项目采用 AGPL-3.0-or-later 许可证。
-新版界面参考 [AlbusGuo/albus-imagine](https://github.com/AlbusGuo/albus-imagine) 的布局与交互，该项目采用 AGPL-3.0 许可证；Zotero 版使用自身的控件和数据模型。
+图片管理器改编自 [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview)，源项目采用 AGPL-3.0-or-later 许可证。由于原仓库暂停更新且不适配新版zotero，因此集成到本仓库了，感谢原作者的杰出工作。
 
 ## 功能
 
@@ -44,6 +43,14 @@ Zotero2Eagle 是一个面向 Zotero 9 和 10 的插件，用于将 PDF 图片标
 ![回链与自动标签](data/双向链接已经自动标签.gif)
 
 每条导入 Eagle 的条目都包含 `zotero://` 回链和自动生成的标签（标题、作者、年份、页码等）。
+
+### 图片管理器
+
+![图片管理器](data/图片管理器.png)
+
+![笔记图片附件](data/笔记图片附件.png)
+
+类似eagle的图片管理器，在使用框选批注后会自动被图片管理器识别并统一管理，同时可以管理笔记中的图片附件
 
 ## 安装
 
@@ -147,7 +154,7 @@ npm test
 
 ## 发布
 
-- 当前版本：`v0.1.8`
+- 当前版本：`v0.2.0`
 - Release note：[GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
 ## 贡献

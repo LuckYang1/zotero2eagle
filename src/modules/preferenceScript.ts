@@ -79,6 +79,15 @@ async function updatePrefsUI() {
 }
 
 function bindPrefEvents() {
+  for (const link of getDocument()?.querySelectorAll<HTMLAnchorElement>(
+    ".z2e-about-links a[href]",
+  ) ?? []) {
+    link.addEventListener("click", (event: Event) => {
+      event.preventDefault();
+      Zotero.launchURL(link.href);
+    });
+  }
+
   getInputElement(prefId("auto-import"))?.addEventListener(
     "change",
     (event: Event) => {

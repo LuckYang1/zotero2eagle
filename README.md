@@ -169,7 +169,7 @@ Current test coverage:
 
 ## Release
 
-- Current version: `v0.2.0`
+- Current version: `v0.2.1`
 - Release notes: [GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
 ## Contributing

@@ -169,7 +169,7 @@ npm test -- --no-watch
 
 ## 发布
 
-- 当前版本：`v0.2.0`
+- 当前版本：`v0.2.1`
 - Release note：[GitHub Releases](https://github.com/LuckYang1/zotero2eagle/releases)
 
 ## 贡献

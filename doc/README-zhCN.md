@@ -8,6 +8,12 @@
 
 Zotero2Eagle 是一个专注于图片管理的插件，用于将 PDF 图片标注导入 Eagle，并保留回到原文 PDF 的链接。同时集成了一个类似eagle图片管理标签可以直接在zotero中使用
 
+<!-- README-I18N:START -->
+
+[English](../README.md) | **简体中文**
+
+<!-- README-I18N:END -->
+
 本项目基于 [yueneiqi/zotero2eagle](https://github.com/yueneiqi/zotero2eagle) 开发，感谢原作者的杰出工作。
 
 图片管理器改编自 [heimi98/zotero-figure-overview](https://github.com/heimi98/zotero-figure-overview)，源项目采用 AGPL-3.0-or-later 许可证。由于原仓库暂停更新且不适配新版zotero，因此集成到本仓库了，感谢原作者的杰出工作。
@@ -18,11 +24,11 @@ Zotero2Eagle 是一个专注于图片管理的插件，用于将 PDF 图片标�
 - 在 Eagle 中写入 `zotero://open-pdf/...` 回链
 - 保存标题、作者、年份、页码、attachment key、annotation key
 - 支持“新建图片标注后自动导入”
-- 支持对所选图片标注、PDF 附件或顶层文献手动导出
+- 支持在 PDF 阅读器中对所选图片标注手动导出
 - 提供图片管理器，可按集合和颜色筛选、预览并跳转到原始批注
 - 勾选多张图片后批量保存到 Eagle，或移入管理器回收站
 - 从管理器回收站恢复图片，或确认后永久删除 Zotero 图片批注
-- 单独管理笔记内嵌图片附件，扫描笔记引用并找出未引用图片
+- 单独管理笔记内嵌图片附件，自动统计笔记引用并找出未引用图片
 
 ## 演示
 
@@ -83,13 +89,13 @@ npm start
 npm run build
 ```
 
-2. 使用 `zotero-plugin-scaffold` 的 release 流程生成 `.xpi`，或将构建后的 addon 用临时扩展方式加载到 Zotero 9 或 10。
+2. 构建完成后，`.scaffold/build/` 中会生成 `zotero-2-eagle.xpi`。在 Zotero 9 或 10 中打开 `Tools -> Plugins`，从齿轮菜单选择 `Install Plugin From File…` 安装这个文件；也可以从齿轮菜单选择 `Debug Plugins`，点击 `Load Temporary Add-on…` 并选择 `.scaffold/build/addon/manifest.json`，把插件作为临时扩展加载。
 
 ## 配置
 
 打开 `Preferences -> Zotero2Eagle`，填写：
 
-- `Automatically import new image annotations into Eagle`
+- `Auto import`
 - `Eagle API URL`
 - `Eagle API Token`
 - `Eagle Folder ID`（可选）
@@ -98,7 +104,7 @@ npm run build
 
 ### 自动导入
 
-1. 勾选 `Automatically import new image annotations into Eagle`
+1. 勾选 `Auto import`
 2. 在 Zotero 中打开 PDF
 3. 新建一个图片标注
 4. 插件会自动等待缓存图片生成并导入 Eagle
@@ -117,7 +123,7 @@ npm run build
 
 管理器回收站会在重启后保留。移入回收站只会在管理器中隐藏图片，原始 Zotero 批注仍存在；在回收站中可以恢复，或确认后永久删除所选批注、清空回收站。永久删除只删除 Zotero 图片批注及其本地缓存；笔记、笔记内嵌图片附件和原始 PDF 均保留。重复保存至 Eagle 沿用现有手动导出行为，可能生成新条目。
 
-管理器另有“笔记图片附件”页签，收录 Zotero 笔记的内嵌图片。可按图片附件文件名、Zotero 集合搜索与筛选，在管理器内预览，打开来源笔记，或把附件文件保存至 Eagle。“扫描未引用图片”会检查笔记中的图片元素并统计引用次数；未扫描或扫描失败时显示“未检查”。笔记图片使用独立回收站；永久删除前会重新检查引用，仅删除确认未引用的附件。扫描本身不会删除图片。
+管理器另有“笔记图片附件”页签，收录 Zotero 笔记的内嵌图片。可按图片附件文件名、Zotero 集合搜索与筛选，在管理器内预览，打开来源笔记，或把附件文件保存至 Eagle。打开页签时会自动检查笔记中的图片元素并统计引用次数，结果保存在 Zotero 数据目录下的引用索引（`zotero2eagle/note-references.json`）中；之后再次打开（包括重启 Zotero 之后）只重新读取上次检查后修改过的笔记。“扫描未引用图片”会重新读取全部笔记。无法完成检查的图片显示“未检查”。笔记图片使用独立回收站；永久删除前会重新检查引用，仅删除确认未引用的附件。检查引用本身不会删除图片。
 
 ## 验证
 
@@ -141,16 +147,25 @@ npm run build
 
 ## 测试
 
+单元测试在 Node 中运行，不需要 Zotero：
+
 ```bash
-npm run build
-npm test
+npm run test:unit
+```
+
+集成测试会启动一个使用独立 profile 和数据目录的 Zotero（需要先按“开发环境加载”配置 `.env`），运行一轮后退出：
+
+```bash
+npm test -- --no-watch
 ```
 
 当前测试覆盖：
 
-- Zotero 回链生成
-- Eagle tags/annotation/文件名生成
-- 插件实例与导出服务是否成功挂载
+- Zotero 回链与 Eagle 导出内容（tags、annotation 文本、文件名、`folderId`）
+- 插件实例、工具栏按钮与图片管理器窗口结构
+- 图片标注与笔记图片的读取、筛选、排序与阅读器跳转
+- 管理器回收站、多选与永久删除
+- 笔记引用统计与引用索引的增量更新
 
 ## 发布
 

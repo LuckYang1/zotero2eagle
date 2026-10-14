@@ -1,7 +1,4 @@
-import {
-  clearFigureAnnotationCache,
-  type FigureAnnotationRecord,
-} from "./figure-annotations";
+import type { FigureAnnotationRecord } from "./figure-annotations";
 
 interface DeletableAnnotation {
   id: number;
@@ -52,7 +49,6 @@ export async function deleteFigureAnnotation(
   // Match Zotero Reader's annotation deletion path so open readers receive
   // the normal item notifier and the deletion is synced.
   await annotation.eraseTx();
-  clearFigureAnnotationCache();
   let imageCleanupError: unknown = null;
   try {
     await removeCacheImage(annotation);

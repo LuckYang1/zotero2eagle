@@ -134,7 +134,7 @@ class OverviewController {
       }
     });
     this.getRefreshButton().addEventListener("click", () => {
-      void this.reload({ forceRefresh: true });
+      void this.reload();
     });
     this.getElement<HTMLInputElement>(
       "zotero2eagle-image-manager-search",
@@ -185,13 +185,13 @@ class OverviewController {
     this.getGrid().replaceChildren();
   }
 
-  private async reload(options: { forceRefresh?: boolean } = {}) {
+  private async reload() {
     const reloadVersion = ++this.reloadVersion;
     this.getStatus().textContent = getString("overview-loading");
     const refreshBtn = this.getRefreshButton();
     refreshBtn.classList.add("is-loading");
     try {
-      const records = await collectFigureAnnotations(options);
+      const records = await collectFigureAnnotations();
       if (reloadVersion !== this.reloadVersion) {
         return;
       }

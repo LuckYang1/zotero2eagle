@@ -4,8 +4,8 @@ import {
   collectNoteImages,
   deleteUnreferencedNoteImage,
   scanAttachmentReferences,
-  scanNoteReferences,
 } from "../src/modules/note-images";
+import { NoteReferenceIndex } from "../src/modules/note-reference-index";
 
 describe("startup", function () {
   it("should have plugin instance defined", function () {
@@ -144,7 +144,13 @@ describe("startup", function () {
 
   it("should query note attachments and references through Zotero APIs", async function () {
     const images = await collectNoteImages();
-    const scan = await scanNoteReferences();
+    const scan = await new NoteReferenceIndex(
+      PathUtils.join(
+        Zotero.DataDirectory.dir,
+        "startup-test",
+        "note-references.json",
+      ),
+    ).refresh();
     assert.isArray(images);
     assert.equal(scan.checked, scan.total);
   });

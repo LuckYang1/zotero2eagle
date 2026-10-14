@@ -1,4 +1,9 @@
 import { recordIdentity } from "./image-manager-trash";
+import {
+  getContentLibraries,
+  loadItemsWithData,
+  uniqueIDs,
+} from "./item-loading";
 
 export interface NoteImageRecord {
   id: number;
@@ -27,6 +32,14 @@ export interface ReferenceScan {
   total: number;
 }
 
+export interface NoteImageKeys {
+  id: number;
+  key: string;
+  libraryID: number;
+  title: string;
+  imageKeys: string[];
+}
+
 export function extractEmbeddedImageKeys(html: string): string[] {
   const keys: string[] = [];
   for (const tag of html.match(/<img\b(?:"[^"]*"|'[^']*'|[^'">])*?>/gi) ?? []) {
@@ -34,6 +47,19 @@ export function extractEmbeddedImageKeys(html: string): string[] {
     if (match?.[2]) keys.push(match[2]);
   }
   return keys;
+}
+
+export function buildReferenceMap(notes: Iterable<NoteImageKeys>) {
+  const references = new Map<string, NoteReference[]>();
+  for (const note of notes) {
+    for (const key of note.imageKeys) {
+      const identity = recordIdentity({ libraryID: note.libraryID, key });
+      const entries = references.get(identity) ?? [];
+      entries.push({ noteID: note.id, noteKey: note.key, title: note.title });
+      references.set(identity, entries);
+    }
+  }
+  return references;
 }
 
 export function collectReferences(
@@ -45,37 +71,24 @@ export function collectReferences(
     html: string;
   }>,
 ) {
-  const references = new Map<string, NoteReference[]>();
-  for (const note of notes) {
-    for (const key of extractEmbeddedImageKeys(note.html)) {
-      const identity = recordIdentity({ libraryID: note.libraryID, key });
-      const entries = references.get(identity) ?? [];
-      entries.push({ noteID: note.id, noteKey: note.key, title: note.title });
-      references.set(identity, entries);
-    }
-  }
-  return references;
-}
-
-function getLibraries() {
-  return Zotero.Libraries.getAll().filter(
-    (library) => library.libraryType !== "feed",
+  return buildReferenceMap(
+    notes.map((note) => ({
+      ...note,
+      imageKeys: extractEmbeddedImageKeys(note.html),
+    })),
   );
 }
 
-async function getNoteRows(libraryIDs: number[], imageKey?: string) {
-  if (!libraryIDs.length) return [];
-  const placeholders = libraryIDs.map(() => "?").join(",");
-  const matchingKey = imageKey ? " AND N.note LIKE ?" : "";
-  return ((await Zotero.DB.queryAsync(
+async function getNoteRows(libraryID: number, imageKey: string) {
+  return (await Zotero.DB.queryAsync(
     `SELECT N.itemID AS id, I.key AS key, I.libraryID AS libraryID, N.note AS html
      FROM itemNotes N JOIN items I ON I.itemID=N.itemID
      JOIN itemTypes T ON T.itemTypeID=I.itemTypeID
      LEFT JOIN deletedItems D ON D.itemID=N.itemID
      WHERE D.itemID IS NULL AND T.typeName='note'
-     AND I.libraryID IN (${placeholders})${matchingKey}`,
-    imageKey ? [...libraryIDs, `%${imageKey}%`] : libraryIDs,
-  )) ?? []) as Array<{
+     AND I.libraryID=? AND N.note LIKE ?`,
+    [libraryID, `%${imageKey}%`],
+  )) as Array<{
     id: number;
     key: string;
     libraryID: number;
@@ -84,96 +97,54 @@ async function getNoteRows(libraryIDs: number[], imageKey?: string) {
 }
 
 export async function collectNoteImages(): Promise<NoteImageRecord[]> {
-  const libraries = getLibraries();
-  await Promise.all(
-    libraries.map((library) => library.waitForDataLoad?.("item")),
-  );
-  const libraryIDs = libraries.map((library) => library.id);
-  if (!libraryIDs.length) return [];
+  const libraryIDs = getContentLibraries().map((library) => library.id);
   const placeholders = libraryIDs.map(() => "?").join(",");
   const ids = (await Zotero.DB.columnQueryAsync(
     `SELECT A.itemID FROM itemAttachments A JOIN items I ON I.itemID=A.itemID
      JOIN itemNotes N ON N.itemID=A.parentItemID
      LEFT JOIN deletedItems D ON D.itemID=A.itemID
      LEFT JOIN deletedItems PD ON PD.itemID=A.parentItemID
-     WHERE D.itemID IS NULL AND PD.itemID IS NULL
+     WHERE A.linkMode=? AND D.itemID IS NULL AND PD.itemID IS NULL
      AND I.libraryID IN (${placeholders})`,
-    libraryIDs,
+    [Zotero.Attachments.LINK_MODE_EMBEDDED_IMAGE, ...libraryIDs],
   )) as number[];
-  const records: NoteImageRecord[] = [];
-  for (const id of ids) {
-    const item = await Zotero.Items.getAsync(id);
-    if (!item || !item.isEmbeddedImageAttachment()) continue;
-    await item.loadAllData();
-    const note = item.parentItem;
-    if (!note?.isNote?.() || note.deleted) continue;
-    await note.loadAllData();
-    const top = note.parentItem || note;
-    const filePath = (await item.getFilePathAsync()) || null;
-    records.push({
-      id: item.id,
-      key: item.key,
-      libraryID: item.libraryID,
+  const images = await loadItemsWithData(ids, []);
+  const notes = await loadItemsWithData(
+    uniqueIDs(images.map((image) => image.parentItemID)),
+    ["itemData"],
+  );
+  await loadItemsWithData(
+    uniqueIDs(notes.map((note) => note.parentItemID || note.id)),
+    ["collections"],
+  );
+  // 两次查询之间被删除的笔记不会加载，对应的图片一并跳过
+  const loadedImages = images.filter((image) => image.parentItem);
+  const filePaths = await Promise.all(
+    loadedImages.map((image) => image.getFilePathAsync()),
+  );
+  const records = loadedImages.map((image, index): NoteImageRecord => {
+    const note = image.parentItem!;
+    const filePath = filePaths[index] || null;
+    return {
+      id: image.id,
+      key: image.key,
+      libraryID: image.libraryID,
       noteID: note.id,
       noteKey: note.key,
       noteTitle: note.getDisplayTitle() || note.key,
-      filename: item.attachmentFilename || "image.png",
-      dateAdded: item.dateAdded || "",
-      dateModified: item.dateModified || "",
+      filename: image.attachmentFilename || "image.png",
+      dateAdded: image.dateAdded || "",
+      dateModified: image.dateModified || "",
       filePath,
       imageURI: filePath ? Zotero.File.pathToFileURI(filePath) : null,
-      collectionIDs: top.getCollections?.() ?? [],
-    });
-  }
+      collectionIDs: note.topLevelItem.getCollections(),
+    };
+  });
   return records.sort((a, b) => a.filename.localeCompare(b.filename));
 }
 
-export async function scanNoteReferences(
-  onProgress?: (checked: number, total: number) => void,
-): Promise<ReferenceScan> {
-  const rows = await getNoteRows(getLibraries().map((library) => library.id));
-  const notes: Array<{
-    id: number;
-    key: string;
-    libraryID: number;
-    title: string;
-    html: string;
-  }> = [];
-  onProgress?.(0, rows.length);
-  for (let index = 0; index < rows.length; index++) {
-    const row = rows[index];
-    let title = row.key;
-    if (extractEmbeddedImageKeys(row.html ?? "").length) {
-      try {
-        const note = await Zotero.Items.getAsync(row.id);
-        if (note && note.isNote()) {
-          await note.loadAllData();
-          title = note.getDisplayTitle() || row.key;
-        }
-      } catch {
-        // Reference detection uses the database HTML even if display data fails.
-      }
-    }
-    notes.push({
-      id: row.id,
-      key: row.key,
-      libraryID: row.libraryID,
-      title,
-      html: row.html ?? "",
-    });
-    onProgress?.(index + 1, rows.length);
-    if (index % 25 === 24)
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
-  }
-  return {
-    references: collectReferences(notes),
-    checked: rows.length,
-    total: rows.length,
-  };
-}
-
 export async function scanAttachmentReferences(record: NoteImageRecord) {
-  const rows = await getNoteRows([record.libraryID], record.key);
+  const rows = await getNoteRows(record.libraryID, record.key);
   const notes = rows.map((row) => ({
     id: row.id,
     key: row.key,

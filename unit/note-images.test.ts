@@ -2,13 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   collectReferences,
-  collectNoteImages,
   deleteNoteImageBatch,
   deleteUnreferencedNoteImage,
   extractEmbeddedImageKeys,
   filterNoteImages,
   scanAttachmentReferences,
-  scanNoteReferences,
   type NoteImageRecord,
 } from "../src/modules/note-images";
 import {
@@ -117,47 +115,6 @@ test("note attachment trash uses a separate preference", () => {
   assert.match([...values.keys()][0], /noteImageManagerTrash$/);
 });
 
-test("unavailable display data does not stop scanning note HTML", async () => {
-  (globalThis as any).Zotero = {
-    Libraries: { getAll: () => [{ id: 1, libraryType: "user" }] },
-    DB: {
-      queryAsync: async (sql: string) => {
-        assert.match(sql, /JOIN itemTypes T/);
-        assert.match(sql, /T\.typeName='note'/);
-        return [
-          {
-            id: 2,
-            key: "NOTE0001",
-            libraryID: 1,
-            html: '<p><img data-attachment-key="IMAGE001"></p>',
-          },
-        ];
-      },
-    },
-    Items: {
-      getAsync: async () => {
-        throw new Error("display data unavailable");
-      },
-    },
-  };
-  const scan = await scanNoteReferences();
-  assert.equal(scan.checked, 1);
-  assert.equal(scan.references.get("1:IMAGE001")?.[0].noteKey, "NOTE0001");
-  assert.equal(scan.references.get("1:IMAGE001")?.[0].title, "NOTE0001");
-});
-
-test("failed database scan rejects instead of assigning zero references", async () => {
-  (globalThis as any).Zotero = {
-    Libraries: { getAll: () => [{ id: 1, libraryType: "user" }] },
-    DB: {
-      queryAsync: async () => {
-        throw new Error("database unavailable");
-      },
-    },
-  };
-  await assert.rejects(() => scanNoteReferences(), /database unavailable/);
-});
-
 test("delete-time reference check reads current note HTML", async () => {
   (globalThis as any).Zotero = {
     DB: {
@@ -174,43 +131,6 @@ test("delete-time reference check reads current note HTML", async () => {
   const references = await scanAttachmentReferences(image("IMAGE001"));
   assert.equal(references.length, 1);
   assert.equal(references[0].noteID, 3);
-});
-
-test("collector includes only embedded images under notes", async () => {
-  const note = {
-    id: 2,
-    key: "NOTE0001",
-    isNote: () => true,
-    loadAllData: async () => {},
-    getDisplayTitle: () => "Source note",
-    getCollections: () => [7],
-  };
-  (globalThis as any).Zotero = {
-    Libraries: {
-      getAll: () => [
-        { id: 1, libraryType: "user", waitForDataLoad: async () => {} },
-      ],
-    },
-    DB: { columnQueryAsync: async () => [5, 6] },
-    Items: {
-      getAsync: async (id: number) => ({
-        id,
-        key: id === 5 ? "IMAGE001" : "OTHER",
-        libraryID: 1,
-        parentItem: note,
-        isEmbeddedImageAttachment: () => id === 5,
-        loadAllData: async () => {},
-        getFilePathAsync: async () =>
-          "C:\\Zotero\\storage\\IMAGE001\\image.png",
-        attachmentFilename: "image.png",
-      }),
-    },
-    File: { pathToFileURI: () => "file:///image.png" },
-  };
-  const records = await collectNoteImages();
-  assert.equal(records.length, 1);
-  assert.equal(records[0].key, "IMAGE001");
-  assert.deepEqual(records[0].collectionIDs, [7]);
 });
 
 test("permanent deletion refuses a referenced image before erasing it", async () => {

@@ -1,3 +1,9 @@
+import {
+  getContentLibraries,
+  loadItemsWithData,
+  uniqueIDs,
+} from "./item-loading";
+
 export interface FigureAnnotationRecord {
   id: number;
   key: string;
@@ -24,11 +30,6 @@ export interface FigureAnnotationRecord {
 
 export const IMAGE_ANNOTATION_TYPE_ID = 3;
 
-let figureAnnotationCache: FigureAnnotationRecord[] | null = null;
-let figureAnnotationLoadPromise: Promise<FigureAnnotationRecord[]> | null =
-  null;
-let figureAnnotationLoadVersion = 0;
-
 export interface FigureAnnotationPosition {
   pageIndex?: number;
   rects?: number[][];
@@ -39,10 +40,6 @@ export interface FigureAnnotationPosition {
 export interface ImageAnnotationIDQuery {
   sql: string;
   params: Array<number | string>;
-}
-
-export interface CollectFigureAnnotationsOptions {
-  forceRefresh?: boolean;
 }
 
 export interface RuntimeTopLevelItem {
@@ -179,60 +176,28 @@ function dateStringToTime(value: string) {
   return Number.isFinite(time) ? time : 0;
 }
 
-export async function collectFigureAnnotations(
-  options: CollectFigureAnnotationsOptions = {},
-) {
-  if (!options.forceRefresh) {
-    if (figureAnnotationCache) {
-      return [...figureAnnotationCache];
-    }
-    if (figureAnnotationLoadPromise) {
-      return [...(await figureAnnotationLoadPromise)];
-    }
-  }
-
-  const loadVersion = ++figureAnnotationLoadVersion;
-  const loadPromise = loadFigureAnnotations();
-  figureAnnotationLoadPromise = loadPromise;
-
-  try {
-    const records = await loadPromise;
-    if (loadVersion === figureAnnotationLoadVersion) {
-      figureAnnotationCache = [...records];
-    }
-    return [...records];
-  } finally {
-    if (figureAnnotationLoadPromise === loadPromise) {
-      figureAnnotationLoadPromise = null;
-    }
-  }
-}
-
-export function clearFigureAnnotationCache() {
-  figureAnnotationCache = null;
-  figureAnnotationLoadPromise = null;
-  figureAnnotationLoadVersion += 1;
-}
-
-async function loadFigureAnnotations() {
-  const records: FigureAnnotationRecord[] = [];
-  const libraries = Zotero.Libraries.getAll().filter(
-    (library) => library.libraryType !== "feed",
-  );
-
-  await Promise.all(
-    libraries.map((library) => library.waitForDataLoad?.("item")),
-  );
-
+export async function collectFigureAnnotations() {
   const annotationIDs = await getImageAnnotationIDs(
-    libraries.map((library) => library.id),
+    getContentLibraries().map((library) => library.id),
   );
-  const annotations = (await Zotero.Items.getAsync(
-    annotationIDs,
-  )) as Zotero.Item[];
+  const annotations = await loadItemsWithData(annotationIDs, [
+    "annotation",
+    "annotationDeferred",
+  ]);
+  const attachments = await loadItemsWithData(
+    uniqueIDs(annotations.map((annotation) => annotation.parentItemID)),
+    ["itemData"],
+  );
+  // 部分条目类型的显示标题由作者生成，creators 必须先于 itemData 加载
+  await loadItemsWithData(
+    uniqueIDs(
+      attachments.map((attachment) => attachment.parentItemID || attachment.id),
+    ),
+    ["creators", "itemData", "collections"],
+  );
 
+  const records: FigureAnnotationRecord[] = [];
   for (const annotation of annotations) {
-    await annotation.loadAllData();
     const runtimeAnnotation = annotation as unknown as RuntimeAnnotationItem;
     if (!isFigureAnnotationItem(runtimeAnnotation)) {
       continue;
@@ -243,14 +208,12 @@ async function loadFigureAnnotations() {
       continue;
     }
 
-    await attachment.loadAllData();
-    await attachment.topLevelItem?.loadAllData();
-
+    const imagePath = Zotero.Annotations.getCacheImagePath(annotation);
     records.push(
       createFigureAnnotationRecord(
         runtimeAnnotation,
-        getAnnotationImageURI(annotation),
-        getAnnotationImagePath(annotation),
+        Zotero.File.pathToFileURI(imagePath),
+        imagePath,
       ),
     );
   }
@@ -302,20 +265,6 @@ function isReadableAttachment(item: Zotero.Item) {
     item.attachmentReaderType &&
     item.getAnnotations,
   );
-}
-
-function getAnnotationImagePath(annotation: Zotero.Item) {
-  try {
-    return Zotero.Annotations.getCacheImagePath(annotation) || null;
-  } catch (error) {
-    Zotero.logError(error instanceof Error ? error : new Error(String(error)));
-    return null;
-  }
-}
-
-function getAnnotationImageURI(annotation: Zotero.Item) {
-  const path = getAnnotationImagePath(annotation);
-  return path ? Zotero.File.pathToFileURI(path) : null;
 }
 
 function parseAnnotationPosition(

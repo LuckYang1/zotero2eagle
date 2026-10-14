@@ -4,10 +4,10 @@ import {
   collectNoteImages,
   deleteNoteImageBatch,
   filterNoteImages,
-  scanNoteReferences,
   type NoteImageRecord,
   type NoteReference,
 } from "./note-images";
+import { getNoteReferenceIndex } from "./note-reference-index";
 import {
   readNoteTrashEntries,
   reconcileTrashEntries,
@@ -30,6 +30,7 @@ export class NoteManager {
   private trash: TrashEntry[] = readNoteTrashEntries();
   private selected = new Set<string>();
   private references: Map<string, NoteReference[]> | null = null;
+  private checkedNoteCount = 0;
   private view: "library" | "trash" = "library";
   private query = "";
   private sort = {
@@ -150,10 +151,11 @@ export class NoteManager {
     if (this.busy) return;
     const version = ++this.loadVersion;
     this.busy = true;
-    this.references = null;
     this.status(getString("note-loading"));
     this.updateActions();
     this.button("refresh").classList.add("is-loading");
+    // 引用索引的增量更新与图片记录加载并行，各自完成后重新渲染
+    const referenceUpdate = this.updateReferences(false);
     try {
       const records = await collectNoteImages();
       if (version !== this.loadVersion) return;
@@ -165,11 +167,13 @@ export class NoteManager {
       }
       this.renderCollections();
       this.render();
+      if (this.references) this.showReferenceSummary();
       this.status("");
     } catch (error) {
       this.log(error);
       this.status(getString("note-load-failed"));
     } finally {
+      await referenceUpdate;
       if (version === this.loadVersion) {
         this.busy = false;
         this.button("refresh").classList.remove("is-loading");
@@ -181,38 +185,52 @@ export class NoteManager {
   private async scan() {
     if (this.busy) return;
     this.busy = true;
-    this.references = null;
-    this.render();
     this.updateActions();
+    await this.updateReferences(true);
+    this.busy = false;
+    this.updateActions();
+  }
+
+  // 返回失败说明；成功时返回 null
+  private async updateReferences(full: boolean) {
+    const version = this.loadVersion;
     try {
-      const result = await scanNoteReferences((checked, total) => {
-        this.element("scan-status").textContent = getString(
-          "note-scan-progress",
-          {
-            args: { checked, total },
-          },
-        );
+      const result = await getNoteReferenceIndex().refresh({
+        full,
+        onProgress: (read, total) => {
+          if (version !== this.loadVersion) return;
+          this.element("scan-status").textContent = getString(
+            "note-scan-progress",
+            { args: { checked: read, total } },
+          );
+        },
       });
+      if (version !== this.loadVersion) return null;
       this.references = result.references;
-      const unreferenced = this.records.filter(
-        (record) =>
-          !(result.references.get(recordIdentity(record))?.length ?? 0),
-      ).length;
-      this.element("scan-status").textContent = getString("note-scan-result", {
-        args: { checked: result.checked, unreferenced },
-      });
+      this.checkedNoteCount = result.checked;
       this.render();
+      this.showReferenceSummary();
+      return null;
     } catch (error) {
       this.log(error);
-      this.references = null;
-      this.render();
-      this.element("scan-status").textContent = getString("note-scan-failed", {
+      const failure = getString("note-scan-failed", {
         args: { reason: this.errorMessage(error) },
       });
-    } finally {
-      this.busy = false;
-      this.updateActions();
+      if (version !== this.loadVersion) return failure;
+      this.references = null;
+      this.render();
+      this.element("scan-status").textContent = failure;
+      return failure;
     }
+  }
+
+  private showReferenceSummary() {
+    const unreferenced = this.records.filter(
+      (record) => !(this.references?.get(recordIdentity(record))?.length ?? 0),
+    ).length;
+    this.element("scan-status").textContent = getString("note-scan-result", {
+      args: { checked: this.checkedNoteCount, unreferenced },
+    });
   }
 
   private renderCollections() {
@@ -683,32 +701,18 @@ export class NoteManager {
       return;
     this.busy = true;
     this.updateActions();
-    let references: Map<string, NoteReference[]>;
-    let scannedNotes: number;
-    try {
-      const scan = await scanNoteReferences((checked, total) => {
-        this.element("scan-status").textContent = getString(
-          "note-scan-progress",
-          { args: { checked, total } },
-        );
-      });
-      references = scan.references;
-      scannedNotes = scan.checked;
-      this.references = references;
-    } catch (error) {
-      this.log(error);
+    const version = this.loadVersion;
+    // 先把引用索引更新到当前状态；deleteNoteImageBatch 在删除每张图片前还会单独查询一次引用
+    const failure = await this.updateReferences(false);
+    if (version !== this.loadVersion) return;
+    if (failure) {
       this.busy = false;
-      this.references = null;
-      this.render();
-      this.status(
-        getString("note-scan-failed", {
-          args: { reason: this.errorMessage(error) },
-        }),
-      );
+      this.updateActions();
+      this.status(failure);
       return;
     }
     const { deleted, protectedCount, failed, errors } =
-      await deleteNoteImageBatch(records, references, {
+      await deleteNoteImageBatch(records, this.references!, {
         onError: (error) => this.log(error),
       });
     this.trash = this.trash.filter(
@@ -721,12 +725,7 @@ export class NoteManager {
     this.selected.clear();
     this.busy = false;
     this.render();
-    const unreferenced = this.records.filter(
-      (record) => !(references.get(recordIdentity(record))?.length ?? 0),
-    ).length;
-    this.element("scan-status").textContent = getString("note-scan-result", {
-      args: { checked: scannedNotes, unreferenced },
-    });
+    this.showReferenceSummary();
     const summary = getString("note-delete-result", {
       args: { deleted: deleted.size, protected: protectedCount, failed },
     });

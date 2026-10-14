@@ -4,6 +4,8 @@ import {
   teardownOverviewWindow,
 } from "./overviewScript";
 
+const OVERVIEW_URL = `chrome://${config.addonRef}/content/overview.xhtml`;
+
 let overviewWindow: Window | null = null;
 const initializedWindows = new WeakSet<Window>();
 const initializingWindows = new WeakSet<Window>();
@@ -16,7 +18,7 @@ export function openOverviewWindow() {
 
   const parentWindow = Zotero.getMainWindow();
   overviewWindow = parentWindow.openDialog(
-    `chrome://${config.addonRef}/content/overview.xhtml`,
+    OVERVIEW_URL,
     `${config.addonRef}-overview`,
     "chrome,resizable,centerscreen,width=1180,height=780",
   ) as Window;
@@ -66,8 +68,13 @@ function attachOverviewWindowListeners(win: Window) {
     once: true,
   });
 
+  // openDialog 返回时窗口中可能仍是初始的 about:blank，并且在部分平台上它的
+  // readyState 已经是 complete，因此同时核对文档地址
   Promise.resolve().then(() => {
-    if (win.document.readyState === "complete") {
+    if (
+      win.document.documentURI === OVERVIEW_URL &&
+      win.document.readyState === "complete"
+    ) {
       void onOverviewWindowLoad(win);
     }
   });

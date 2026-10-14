@@ -6,6 +6,7 @@ import {
   scanAttachmentReferences,
 } from "../src/modules/note-images";
 import { NoteReferenceIndex } from "../src/modules/note-reference-index";
+import { closeOverviewWindow, waitForOverviewReady } from "./overview-helpers";
 
 describe("startup", function () {
   it("should have plugin instance defined", function () {
@@ -27,11 +28,7 @@ describe("startup", function () {
   it("should open the image manager window with batch and trash controls", async function () {
     const manager = Zotero[config.addonInstance].api.openOverview() as Window;
     try {
-      if (manager.document.readyState !== "complete") {
-        await new Promise<void>((resolve) =>
-          manager.addEventListener("load", () => resolve(), { once: true }),
-        );
-      }
+      await waitForOverviewReady(manager);
       assert.exists(
         manager.document.getElementById(
           `${config.addonRef}-image-manager-grid`,
@@ -138,7 +135,7 @@ describe("startup", function () {
       assert.equal(manager.getComputedStyle(figureRoot).display, "grid");
       assert.equal(manager.getComputedStyle(noteRoot).display, "none");
     } finally {
-      manager.close();
+      await closeOverviewWindow(manager);
     }
   });
 

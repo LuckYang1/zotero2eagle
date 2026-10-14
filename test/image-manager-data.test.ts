@@ -3,6 +3,7 @@ import { config } from "../package.json";
 import { collectFigureAnnotations } from "../src/modules/figure-annotations";
 import { collectNoteImages } from "../src/modules/note-images";
 import { NoteReferenceIndex } from "../src/modules/note-reference-index";
+import { closeOverviewWindow, waitForOverviewReady } from "./overview-helpers";
 
 const PNG_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLytQAAAABJRU5ErkJggg==";
@@ -312,8 +313,9 @@ describe("image manager data", function () {
     const referenced = await createImageNote("Window referenced note");
     const orphanNote = await createNote("<h1>Window orphan note</h1>");
     await attachImage(orphanNote);
-    const manager = await openNoteTab();
+    const manager = Zotero[config.addonInstance].api.openOverview() as Window;
     try {
+      await showNoteTab(manager);
       const { unchecked, unreferenced } = noteBadgeLabels();
       const badges = await waitForCheckedBadges(manager, 2);
       assert.notInclude(badges, unchecked);
@@ -328,7 +330,7 @@ describe("image manager data", function () {
         ),
       );
     } finally {
-      manager.close();
+      await closeOverviewWindow(manager);
       await referenced.note.eraseTx();
       await orphanNote.eraseTx();
     }
@@ -340,8 +342,9 @@ describe("image manager data", function () {
     const referenced = await createImageNote("Deletion referenced note");
     const orphanNote = await createNote("<h1>Deletion orphan note</h1>");
     const orphan = await attachImage(orphanNote);
-    const manager = await openNoteTab();
+    const manager = Zotero[config.addonInstance].api.openOverview() as Window;
     try {
+      await showNoteTab(manager);
       const { unreferenced } = noteBadgeLabels();
       await waitForCheckedBadges(manager, 2);
       const grid = noteElement(manager, "grid");
@@ -370,26 +373,20 @@ describe("image manager data", function () {
       assert.exists(await Zotero.Items.getAsync(referenced.image.id));
     } finally {
       Zotero.Prefs.set(confirmPref, true, true);
-      manager.close();
+      await closeOverviewWindow(manager);
       await referenced.note.eraseTx();
       await orphanNote.eraseTx();
     }
   });
 });
 
-async function openNoteTab() {
-  const manager = Zotero[config.addonInstance].api.openOverview() as Window;
-  if (manager.document.readyState !== "complete") {
-    await new Promise<void>((resolve) =>
-      manager.addEventListener("load", () => resolve(), { once: true }),
-    );
-  }
+async function showNoteTab(manager: Window) {
+  await waitForOverviewReady(manager);
   (
     manager.document.getElementById(
       `${config.addonRef}-tab-notes`,
     ) as HTMLElement
   ).click();
-  return manager;
 }
 
 function noteElement(manager: Window, name: string) {

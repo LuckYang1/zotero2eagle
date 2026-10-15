@@ -310,6 +310,8 @@ describe("image manager data", function () {
   });
 
   it("shows note reference status when the note tab opens without a manual scan", async function () {
+    const referencedTitle = "Window referenced note";
+    const orphanTitle = "Window orphan note";
     const referenced = await createImageNote("Window referenced note");
     const orphanNote = await createNote("<h1>Window orphan note</h1>");
     await attachImage(orphanNote);
@@ -317,9 +319,12 @@ describe("image manager data", function () {
     try {
       await showNoteTab(manager);
       const { unchecked, unreferenced } = noteBadgeLabels();
-      const badges = await waitForCheckedBadges(manager, 2);
-      assert.notInclude(badges, unchecked);
-      assert.equal(badges.filter((badge) => badge === unreferenced).length, 1);
+      const badges = await waitForNoteBadges(manager, [
+        referencedTitle,
+        orphanTitle,
+      ]);
+      assert.notEqual(badges.get(referencedTitle), unchecked);
+      assert.equal(badges.get(orphanTitle), unreferenced);
       assert.isTrue(
         await IOUtils.exists(
           PathUtils.join(
@@ -339,27 +344,25 @@ describe("image manager data", function () {
   it("permanently deletes an unreferenced note image from the manager trash", async function () {
     const confirmPref = `${config.prefsPrefix}.confirmDelete`;
     Zotero.Prefs.set(confirmPref, false, true);
+    const orphanTitle = "Deletion orphan note";
     const referenced = await createImageNote("Deletion referenced note");
     const orphanNote = await createNote("<h1>Deletion orphan note</h1>");
     const orphan = await attachImage(orphanNote);
     const manager = Zotero[config.addonInstance].api.openOverview() as Window;
     try {
       await showNoteTab(manager);
-      const { unreferenced } = noteBadgeLabels();
-      await waitForCheckedBadges(manager, 2);
-      const grid = noteElement(manager, "grid");
-      const orphanCard = [...grid.querySelectorAll(".figure-card")].find(
-        (card) =>
-          card.querySelector(".figure-ref-badge")?.textContent === unreferenced,
-      )!;
+      await waitForNoteBadges(manager, [orphanTitle]);
+      const orphanCard = (await waitForNoteCard(manager, orphanTitle))!;
       (
         orphanCard.querySelector(".figure-select-checkbox") as HTMLInputElement
       ).click();
       noteElement(manager, "move-trash").click();
       noteElement(manager, "trash").click();
-      assert.lengthOf(grid.querySelectorAll(".figure-card"), 1);
+      const trashedOrphan = (await waitForNoteCard(manager, orphanTitle))!;
       (
-        grid.querySelector(".figure-select-checkbox") as HTMLInputElement
+        trashedOrphan.querySelector(
+          ".figure-select-checkbox",
+        ) as HTMLInputElement
       ).click();
       noteElement(manager, "delete-forever").click();
       const startedAt = Date.now();
@@ -407,19 +410,52 @@ function noteBadgeLabels() {
   return { unchecked, unreferenced };
 }
 
-// 等待笔记页签渲染出指定数量的卡片，并且全部卡片都已有引用状态
-async function waitForCheckedBadges(manager: Window, count: number) {
-  const { unchecked } = noteBadgeLabels();
-  const grid = noteElement(manager, "grid");
+function noteCards(manager: Window) {
+  return [...noteElement(manager, "grid").querySelectorAll(".figure-card")];
+}
+
+function noteCardTitle(card: Element) {
+  return card.querySelector(".figure-note-meta")?.textContent?.trim() || "";
+}
+
+async function waitForNoteCard(manager: Window, noteTitle: string) {
   const startedAt = Date.now();
-  let badges: string[] = [];
+  let matched: Element | null = null;
   while (Date.now() - startedAt < 20_000) {
-    badges = [...grid.querySelectorAll(".figure-ref-badge")].map(
-      (badge) => badge.textContent ?? "",
-    );
-    if (badges.length >= count && !badges.includes(unchecked)) break;
+    matched =
+      noteCards(manager).find((card) => noteCardTitle(card) === noteTitle) ||
+      null;
+    if (matched) break;
     await Zotero.Promise.delay(50);
   }
-  assert.lengthOf(badges, count);
+  assert.exists(matched);
+  return matched;
+}
+
+// 等待笔记页签中指定笔记都渲染出卡片，并且这些卡片都已有引用状态
+async function waitForNoteBadges(manager: Window, noteTitles: string[]) {
+  const { unchecked } = noteBadgeLabels();
+  const startedAt = Date.now();
+  const badges = new Map<string, string>();
+  while (Date.now() - startedAt < 20_000) {
+    badges.clear();
+    for (const card of noteCards(manager)) {
+      const title = noteCardTitle(card);
+      if (!noteTitles.includes(title)) continue;
+      badges.set(
+        title,
+        card.querySelector(".figure-ref-badge")?.textContent?.trim() || "",
+      );
+    }
+    if (
+      noteTitles.every(
+        (title) => badges.has(title) && badges.get(title) !== unchecked,
+      )
+    ) {
+      break;
+    }
+    await Zotero.Promise.delay(50);
+  }
+  assert.sameMembers([...badges.keys()], noteTitles);
   return badges;
 }

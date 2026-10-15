@@ -21,6 +21,9 @@ export function waitForOverviewReady(manager: Window) {
       !manager.closed &&
       manager.document.documentURI === OVERVIEW_URL &&
       manager.document.readyState === "complete" &&
+      !!manager.document.getElementById(
+        `${config.addonRef}-image-manager-grid`,
+      ) &&
       !!manager.document.documentElement
         ?.getAttribute("title")
         ?.includes(`v${version}`),
